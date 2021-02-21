@@ -11,24 +11,44 @@ export const GET_MEMBER = 'GET_MEMBER';
 export const FETCH_MEMBERS = 'FETCH_MEMBERS';
 export const FETCH_CHATS = 'FETCH_CHATS';
 export const ADD_CHAT = 'ADD_CHAT';
+export const SEND_MESSAGE = 'SEND_MESSAGE';
+export const FETCH_MESSAGE = 'FETCH_MESSAGE';
 
 export const ERROR = 'red';
 export const SUCCSSES = 'green';
 
 export interface Message {
-	title: string;
-	timeStamp: string;
+	content: string;
 	id: string;
+	chatId: string;
+	sendTime: any;
 	memberName: string;
-	photoURL: string;
-	email: string;
+	memberAvatarUrl: string;
+	memberEmail: string;
+	memberId: string;
 }
 
-export interface Chat {
-	chatId: string;
-	chatName: string;
-	chatAvatr: string;
+export interface Messages {
 	messages: Array<Message>;
+}
+
+interface sendMessageAction {
+	type: typeof SEND_MESSAGE;
+	payload: Message;
+}
+
+interface updateMessageAction {
+	type: typeof FETCH_MESSAGE;
+	payload: any;
+}
+
+export type MessageActions = sendMessageAction | updateMessageAction;
+
+export interface Chat {
+	chatId: string | undefined;
+	chatName: string;
+	chatAvatar: string;
+	createTime: any;
 }
 
 export interface Chats {

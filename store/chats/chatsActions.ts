@@ -1,4 +1,4 @@
-import { auth } from './../../libs/firebase';
+import { auth, serverTime } from './../../libs/firebase';
 import { ADD_CHAT, Chat, ERROR, FETCH_CHATS } from '../types';
 import { Action } from 'redux';
 import { ThunkAction } from 'redux-thunk';
@@ -37,29 +37,37 @@ export const fetchChats = (): ThunkAction<
 
 		dispatch(hideLoading());
 	} catch (error) {
-		dispatch(showAlert(error.message, ERROR));
+		dispatch(showAlert(error.message + 'fetchChat', ERROR));
 		dispatch(hideLoading());
 	}
 };
 
 export const addChat = (
-	payload: Chat
+	chatName: string
 ): ThunkAction<void, RootState, unknown, Action> => {
 	return async (dispatch) => {
 		try {
 			dispatch(showLoading());
+
 			const member = auth.currentUser;
+			const payload: Chat = {
+				chatName,
+				chatId: member?.uid,
+				createTime: serverTime,
+				chatAvatar:
+					'https://business.ucr.edu/sites/g/files/rcwecm2116/files/styles/form_preview/public/icon-group.png?itok=3LzNDSRI',
+			};
 
 			await db
 				.collection('chats')
 				.doc(member?.uid)
 				.set(payload)
-				.catch((e) => dispatch(showAlert(e.message, ERROR)));
+				.catch((e) => dispatch(showAlert(e.message + 'addChat', ERROR)));
 
 			dispatch(addChatAction(payload));
 			dispatch(hideLoading());
 		} catch (error) {
-			dispatch(showAlert(error.message, ERROR));
+			dispatch(showAlert(error.message + 'addChat2', ERROR));
 			dispatch(hideLoading());
 		}
 	};

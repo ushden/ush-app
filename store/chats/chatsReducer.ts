@@ -6,17 +6,8 @@ const initialState: Chats = {
 		{
 			chatId: '',
 			chatName: '',
-			chatAvatr: '',
-			messages: [
-				{
-					title: '',
-					timeStamp: '',
-					id: '',
-					memberName: '',
-					photoURL: '',
-					email: '',
-				},
-			],
+			chatAvatar: '',
+			createTime: '',
 		},
 	],
 };

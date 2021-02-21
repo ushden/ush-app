@@ -1,4 +1,4 @@
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useCallback, useState } from 'react';
 import {
@@ -25,10 +25,11 @@ export const MainScreen = () => {
 	);
 	const loading = useSelector((state: RootState) => state.loading.loading);
 	const dispatch = useDispatch();
+	const route = useRoute();
 
 	useEffect(() => {
 		dispatch(getMember());
-	}, []);
+	}, [route.name]);
 
 	useEffect(() => {
 		navigation.setOptions({

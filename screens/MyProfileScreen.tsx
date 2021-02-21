@@ -1,6 +1,6 @@
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
 	SafeAreaView,
 	ScrollView,
@@ -26,6 +26,7 @@ const wait = (timeout: number): Promise<any> => {
 
 export const ProfileScreen = () => {
 	const navigation = useNavigation();
+	const route = useRoute();
 
 	const [refreshing, setRefreshing] = useState(false);
 	const { name, email, photoUrl }: any = useSelector(
@@ -36,6 +37,8 @@ export const ProfileScreen = () => {
 		setRefreshing(true);
 		wait(2000).then(() => setRefreshing(false));
 	}, []);
+
+	useEffect(() => {}, [route.name]);
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -55,9 +58,7 @@ export const ProfileScreen = () => {
 					<TouchableOpacity>
 						<Avatar.Image
 							source={{
-								uri: photoUrl
-									? photoUrl
-									: 'https://lh3.googleusercontent.com/-JM2xsdjz2Bw/AAAAAAAAAAI/AAAAAAAAAAA/DVECr-jVlk4/photo.jpg',
+								uri: photoUrl,
 							}}
 							size={120}
 						/>

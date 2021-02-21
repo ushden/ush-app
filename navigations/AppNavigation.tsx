@@ -5,8 +5,6 @@ import { MainNavigation } from './MainNavigation';
 import { useUser } from '../hooks/useUser';
 import { UpdateProfileScreen } from '../screens/UpdateProfileScreen';
 import { UserProfileScreen } from '../screens/MemberProfileScreen';
-import { CreateChatScreen } from '../screens/CreateChatScreen';
-import { ChatScreen } from '../screens/ChatScreen';
 
 const AppNavigationStack = createStackNavigator();
 
@@ -28,11 +26,6 @@ export const AppNavigation = () => {
 				name='UserProfileScreen'
 				component={UserProfileScreen}
 			/>
-			<AppNavigationStack.Screen
-				name='CreateChat'
-				component={CreateChatScreen}
-			/>
-			<AppNavigationStack.Screen name='Chat' component={ChatScreen} />
 		</AppNavigationStack.Navigator>
 	);
 };

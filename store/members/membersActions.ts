@@ -37,7 +37,11 @@ export const signUp = (
 				.createUserWithEmailAndPassword(email, password)
 				.then((user) => {
 					if (user) {
-						user.user?.updateProfile({ displayName: name });
+						user.user?.updateProfile({
+							displayName: name,
+							photoURL:
+								'https://lh3.googleusercontent.com/-JM2xsdjz2Bw/AAAAAAAAAAI/AAAAAAAAAAA/DVECr-jVlk4/photo.jpg',
+						});
 						return user;
 					}
 				})

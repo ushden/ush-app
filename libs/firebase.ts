@@ -16,6 +16,7 @@ if (firebase.apps.length === 0) {
 	firebase.initializeApp(config);
 }
 
-export const serverTime = firebase.firestore.Timestamp;
+export const serverTime = firebase.firestore.FieldValue.serverTimestamp();
+
 export const auth = firebase.auth();
 export const db = firebase.firestore();

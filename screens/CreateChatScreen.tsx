@@ -1,51 +1,62 @@
-import React, { useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { StatusBar } from 'expo-status-bar';
+import React, { useState, useEffect } from 'react';
 import {
 	SafeAreaView,
 	StyleSheet,
 	View,
 	Text,
-	StatusBar as StatusBarNative,
 	Keyboard,
+	TouchableOpacity,
 } from 'react-native';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { Button, TextInput } from 'react-native-paper';
-import { useDispatch } from 'react-redux';
-import { useUser } from '../hooks/useUser';
-import { serverTime } from '../libs/firebase';
-import { addChat } from '../store/chats/chatsActions';
-import { Chat } from '../store/types';
+import { useDispatch, useSelector } from 'react-redux';
+import { addChat, fetchChats } from '../store/chats/chatsActions';
+import { RootState } from '../store/rootReducer';
+import { AntDesign } from '@expo/vector-icons';
 
 export const CreateChatScreen = () => {
 	const [chatName, setChatName] = useState('');
 	const dispatch = useDispatch();
-
-	const member = useUser();
+	const navigation = useNavigation();
+	const loading = useSelector((state: RootState) => state.loading.loading);
 
 	const handlePress = () => {
-		const payload: Chat = {
-			chatName: chatName,
-			chatId: member?.uid,
-			chatAvatr:
-				'https://business.ucr.edu/sites/g/files/rcwecm2116/files/styles/form_preview/public/icon-group.png?itok=3LzNDSRI',
-			messages: [
-				{
-					title: 'Вы создали публичный чат, приятно общения',
-					timeStamp: serverTime.toString(),
-					id: Date.now().toString(),
-					memberName: 'Club 48',
-					photoURL: '',
-					email: '',
-				},
-			],
-		};
-
-		dispatch(addChat(payload));
+		dispatch(addChat(chatName));
+		navigation.goBack();
+		dispatch(fetchChats());
 	};
+
+	useEffect(() => {
+		navigation.setOptions({
+			title: 'Создать чат',
+			headerTitleAlign: 'center',
+			headerStyle: { backgroundColor: '#aa4848' },
+			headerTitleStyle: { color: '#fff' },
+			headerLeftContainerStyle: {
+				alignItems: 'center',
+				justifyContent: 'center',
+			},
+			headerLeft: () => (
+				<TouchableOpacity onPress={() => navigation.goBack()}>
+					<AntDesign
+						name='arrowleft'
+						size={25}
+						color='#fff'
+						style={{ marginLeft: 15 }}
+					/>
+				</TouchableOpacity>
+			),
+		});
+	}, []);
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<View style={styles.statusBar}></View>
-			<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+			<StatusBar style='light' />
+			<TouchableWithoutFeedback
+				onPress={() => Keyboard.dismiss()}
+				style={{ height: '100%' }}>
 				<View style={styles.createChat}>
 					<Text style={styles.title}>Введите название чата</Text>
 					<TextInput
@@ -54,8 +65,13 @@ export const CreateChatScreen = () => {
 						selectionColor='#aa4848'
 						onChangeText={(text) => setChatName(text)}
 						underlineColor='#aa4848'
+						style={styles.input}
 					/>
-					<Button mode='contained' color='#aa4848' onPress={handlePress}>
+					<Button
+						mode='contained'
+						color='#aa4848'
+						onPress={handlePress}
+						loading={loading}>
 						Создать
 					</Button>
 				</View>
@@ -67,19 +83,19 @@ export const CreateChatScreen = () => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		alignItems: 'center',
-	},
-	statusBar: {
-		paddingTop: StatusBarNative.currentHeight,
-		backgroundColor: '#aa4848',
+		height: '100%',
 	},
 	createChat: {
-		flex: 1,
-		alignItems: 'center',
+		paddingHorizontal: 10,
+		height: '100%',
 		justifyContent: 'center',
 	},
 	title: {
 		fontSize: 25,
 		textAlign: 'center',
+		color: 'black',
+	},
+	input: {
+		marginBottom: 10,
 	},
 });

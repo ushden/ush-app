@@ -1,10 +1,10 @@
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import React from 'react';
-import { ChatsSrceen } from '../screens/ChatsSrceen';
 import { MainScreen } from '../screens/MainScreen';
 import { ProfileScreen } from '../screens/MyProfileScreen';
 import { UsersScreen } from '../screens/MembersListScreen';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { ChatNavigation } from './ChatNavigation';
 
 const MainNavigationStack = createMaterialBottomTabNavigator();
 
@@ -14,7 +14,7 @@ export const MainNavigation = () => {
 			<MainNavigationStack.Screen name='main' component={MainScreen} />
 			<MainNavigationStack.Screen
 				name='chats'
-				component={ChatsSrceen}
+				component={ChatNavigation}
 				options={{
 					tabBarLabel: 'Чаты',
 					tabBarIcon: ({ color }: any) => (
