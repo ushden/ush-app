@@ -65,44 +65,45 @@ export const SignUpScreen = () => {
 			<KeyboardAvoidingView
 				style={{ flex: 1, paddingHorizontal: 15 }}
 				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-				<ScrollView>
-					<Text
-						style={{ textAlign: 'center', fontWeight: 'bold', fontSize: 20 }}>
-						Добро пожаловать в CLUB 48
-					</Text>
-					<Text style={{ marginBottom: 10, textAlign: 'center' }}>
-						Введите даные для регистрации
-					</Text>
-					<TextInput
-						mode='outlined'
-						label='Имя'
-						left={<TextInput.Icon name='account-cowboy-hat' color='black' />}
-						style={{ marginBottom: 10 }}
-						value={name}
-						onChangeText={(text) => setName(text)}
-					/>
-					<TextInput
-						mode='outlined'
-						label='Емейл'
-						left={<TextInput.Icon name='account-heart' color='black' />}
-						style={{ marginBottom: 10 }}
-						value={email}
-						onChangeText={(text) => setEmail(text)}
-					/>
-					<TextInput
-						mode='outlined'
-						label='Пароль'
-						secureTextEntry={true}
-						left={<TextInput.Icon name='account-lock' color='black' />}
-						style={{ marginBottom: 10 }}
-						value={password}
-						onChangeText={(text) => setPassword(text)}
-					/>
-					<Button mode='contained' onPress={pressHandler} loading={loading}>
-						Регистрация
-					</Button>
-				</ScrollView>
-				<View style={{ height: 50, width: '100%' }}></View>
+				<>
+					<ScrollView>
+						<Text
+							style={{ textAlign: 'center', fontWeight: 'bold', fontSize: 20 }}>
+							Добро пожаловать в CLUB 48
+						</Text>
+						<Text style={{ marginBottom: 10, textAlign: 'center' }}>
+							Введите даные для регистрации
+						</Text>
+						<TextInput
+							mode='outlined'
+							label='Имя'
+							left={<TextInput.Icon name='account-cowboy-hat' color='black' />}
+							style={{ marginBottom: 10 }}
+							value={name}
+							onChangeText={(text) => setName(text)}
+						/>
+						<TextInput
+							mode='outlined'
+							label='Емейл'
+							left={<TextInput.Icon name='account-heart' color='black' />}
+							style={{ marginBottom: 10 }}
+							value={email}
+							onChangeText={(text) => setEmail(text)}
+						/>
+						<TextInput
+							mode='outlined'
+							label='Пароль'
+							secureTextEntry={true}
+							left={<TextInput.Icon name='account-lock' color='black' />}
+							style={{ marginBottom: 10 }}
+							value={password}
+							onChangeText={(text) => setPassword(text)}
+						/>
+						<Button mode='contained' onPress={pressHandler} loading={loading}>
+							Регистрация
+						</Button>
+					</ScrollView>
+				</>
 			</KeyboardAvoidingView>
 		</SafeAreaView>
 	);

@@ -38,8 +38,6 @@ export const ProfileScreen = () => {
 		wait(2000).then(() => setRefreshing(false));
 	}, []);
 
-	useEffect(() => {}, [route.name]);
-
 	return (
 		<SafeAreaView style={styles.container}>
 			<StatusBar style='light' />

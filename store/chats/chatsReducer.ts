@@ -1,13 +1,29 @@
-import { ADD_CHAT, chatsAction } from './../types';
-import { Chats, FETCH_CHATS } from '../types';
+import {
+	ADD_CHAT,
+	chatsAction,
+	FETCH_PRIVATE_CHATS,
+	CREATE_PRIVATE_CHAT,
+} from './../types';
+import { Chats, FETCH_PUBLIC_CHATS } from '../types';
 
 const initialState: Chats = {
-	chats: [
+	publicChats: [
 		{
 			chatId: '',
 			chatName: '',
 			chatAvatar: '',
 			createTime: '',
+			_chatType: 'publicChats',
+		},
+	],
+	privateChats: [
+		{
+			chatId: '',
+			createMemberId: '',
+			_chatType: 'privateChats',
+			membersName: [],
+			membersPhotoUrl: [],
+			membersId: [],
 		},
 	],
 };
@@ -17,10 +33,23 @@ export const chatsReducer = (
 	action: chatsAction
 ): Chats => {
 	switch (action.type) {
-		case FETCH_CHATS:
-			return { ...state, chats: [...action.payload] };
-		case ADD_CHAT:
-			return { ...state, chats: [...state.chats, ...action.payload] };
+		case FETCH_PUBLIC_CHATS:
+			return { ...state, publicChats: [...action.payload] };
+		// case ADD_CHAT:
+		// 	return {
+		// 		...state,
+		// 		publicChats: [...state.publicChats, action.payload],
+		// 	};
+		case FETCH_PRIVATE_CHATS:
+			return {
+				...state,
+				privateChats: [...action.payload],
+			};
+		// case CREATE_PRIVATE_CHAT:
+		// 	return {
+		// 		...state,
+		// 		privateChats: [...state.privateChats, action.payload],
+		// 	};
 		default:
 			return state;
 	}

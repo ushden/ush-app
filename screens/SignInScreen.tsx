@@ -60,48 +60,52 @@ export const SignInScreen = () => {
 				style={{ flex: 1 }}
 				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
 				keyboardVerticalOffset={100}>
-				<View style={styles.img}>
-					<Image
-						source={{
-							uri:
-								'https://firebasestorage.googleapis.com/v0/b/ush-app.appspot.com/o/Club48.jpg?alt=media&token=65e6eb37-ee3a-424c-b363-4e2a4f3a6042',
-						}}
-						style={{ width: '100%', height: '100%', resizeMode: 'center' }}
-					/>
-				</View>
-				<ScrollView
-					style={styles.form}
-					refreshControl={
-						<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-					}>
-					<TextInput
-						mode='outlined'
-						label='Емейл'
-						left={<TextInput.Icon name='account' color='black' />}
-						style={{ marginBottom: 10 }}
-						value={email}
-						onChangeText={(text) => setEmail(text)}
-					/>
-					<TextInput
-						mode='outlined'
-						label='Пароль'
-						secureTextEntry={true}
-						left={<TextInput.Icon name='lock' color='black' />}
-						style={{ marginBottom: 15 }}
-						value={password}
-						onChangeText={(text) => setPassword(text)}
-					/>
-					<Button
-						mode='contained'
-						style={{ marginBottom: 10 }}
-						onPress={pressHandler}
-						loading={loading}>
-						Войти
-					</Button>
-					<Button mode='outlined' onPress={() => navigation.navigate('SignUp')}>
-						Регистрация
-					</Button>
-				</ScrollView>
+				<>
+					<View style={styles.img}>
+						<Image
+							source={{
+								uri:
+									'https://firebasestorage.googleapis.com/v0/b/ush-app.appspot.com/o/Club48.jpg?alt=media&token=65e6eb37-ee3a-424c-b363-4e2a4f3a6042',
+							}}
+							style={{ width: '100%', height: '100%', resizeMode: 'center' }}
+						/>
+					</View>
+					<ScrollView
+						style={styles.form}
+						refreshControl={
+							<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+						}>
+						<TextInput
+							mode='outlined'
+							label='Емейл'
+							left={<TextInput.Icon name='account' color='black' />}
+							style={{ marginBottom: 10 }}
+							value={email}
+							onChangeText={(text) => setEmail(text)}
+						/>
+						<TextInput
+							mode='outlined'
+							label='Пароль'
+							secureTextEntry={true}
+							left={<TextInput.Icon name='lock' color='black' />}
+							style={{ marginBottom: 15 }}
+							value={password}
+							onChangeText={(text) => setPassword(text)}
+						/>
+						<Button
+							mode='contained'
+							style={{ marginBottom: 10 }}
+							onPress={pressHandler}
+							loading={loading}>
+							Войти
+						</Button>
+						<Button
+							mode='outlined'
+							onPress={() => navigation.navigate('SignUp')}>
+							Регистрация
+						</Button>
+					</ScrollView>
+				</>
 			</KeyboardAvoidingView>
 		</SafeAreaView>
 	);

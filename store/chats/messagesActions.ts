@@ -17,14 +17,15 @@ const fetchMessagesAction = (payload: Message) => ({
 });
 
 export const sendMessage = (
-	message: Message
+	message: Message,
+	chatType: string
 ): ThunkAction<void, RootState, unknown, Action> => {
 	return async (dispatch) => {
 		try {
 			dispatch(showLoading());
 
 			await db
-				.collection('chats')
+				.collection(chatType)
 				.doc(message.chatId)
 				.collection('messages')
 				.add(message)
@@ -49,7 +50,7 @@ export const fetchMessages = (
 			const payload: any = [];
 
 			await db
-				.collection('chats')
+				.collection('publicChats')
 				.doc(chatId)
 				.collection('messages')
 				.get()

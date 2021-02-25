@@ -1,5 +1,12 @@
+import {
+	PrivateChat,
+	FETCH_PRIVATE_CHATS,
+	CREATE_PRIVATE_CHAT,
+	PRIVATE_CHATS,
+	PUBLIC_CHATS,
+} from './../types';
 import { auth, serverTime } from './../../libs/firebase';
-import { ADD_CHAT, Chat, ERROR, FETCH_CHATS } from '../types';
+import { ADD_CHAT, PublicChat, ERROR, FETCH_PUBLIC_CHATS } from '../types';
 import { Action } from 'redux';
 import { ThunkAction } from 'redux-thunk';
 import { RootState } from '../rootReducer';
@@ -7,11 +14,19 @@ import { showAlert } from '../alert/alertActions';
 import { hideLoading, showLoading } from '../loading/loadingActions';
 import { db } from '../../libs/firebase';
 
-const fetchChatsAction = (payload: Array<Chat>) => ({
-	type: FETCH_CHATS,
+const fetchChatsAction = (payload: Array<PublicChat>) => ({
+	type: FETCH_PUBLIC_CHATS,
 	payload,
 });
-const addChatAction = (payload: Chat) => ({ type: ADD_CHAT, payload });
+const fetchPrivateChatsAction = (payload: Array<PrivateChat>) => ({
+	type: FETCH_PRIVATE_CHATS,
+	payload,
+});
+const addChatAction = (payload: PublicChat) => ({ type: ADD_CHAT, payload });
+const createPrivateChatAction = (payload: PrivateChat) => ({
+	type: CREATE_PRIVATE_CHAT,
+	payload,
+});
 
 export const fetchChats = (): ThunkAction<
 	void,
@@ -21,10 +36,10 @@ export const fetchChats = (): ThunkAction<
 > => async (dispatch) => {
 	try {
 		dispatch(showLoading());
-		const payload: Array<Chat> = [];
+		const payload: Array<PublicChat> = [];
 
 		await db
-			.collection('chats')
+			.collection('publicChats')
 			.get()
 			.then((querySnapshot) => {
 				querySnapshot.forEach((doc) => {
@@ -37,7 +52,36 @@ export const fetchChats = (): ThunkAction<
 
 		dispatch(hideLoading());
 	} catch (error) {
-		dispatch(showAlert(error.message + 'fetchChat', ERROR));
+		dispatch(showAlert(error.message, ERROR));
+		dispatch(hideLoading());
+	}
+};
+
+export const fetchPrivateChats = (): ThunkAction<
+	void,
+	RootState,
+	unknown,
+	Action
+> => async (dispatch) => {
+	try {
+		dispatch(showLoading());
+		const payload: Array<PrivateChat> = [];
+
+		await db
+			.collection(PRIVATE_CHATS)
+			.get()
+			.then((querySnapshot) => {
+				querySnapshot.forEach((doc) => {
+					const data: any = doc.data();
+					payload.push(data);
+				});
+
+				dispatch(fetchPrivateChatsAction(payload));
+			});
+
+		dispatch(hideLoading());
+	} catch (error) {
+		dispatch(showAlert(error.message, ERROR));
 		dispatch(hideLoading());
 	}
 };
@@ -49,9 +93,10 @@ export const addChat = (
 		try {
 			dispatch(showLoading());
 
-			const member = auth.currentUser;
-			const payload: Chat = {
+			const member: any = auth.currentUser;
+			const payload: PublicChat = {
 				chatName,
+				_chatType: PUBLIC_CHATS,
 				chatId: member?.uid,
 				createTime: serverTime,
 				chatAvatar:
@@ -59,15 +104,37 @@ export const addChat = (
 			};
 
 			await db
-				.collection('chats')
+				.collection(PUBLIC_CHATS)
 				.doc(member?.uid)
 				.set(payload)
 				.catch((e) => dispatch(showAlert(e.message + 'addChat', ERROR)));
 
-			dispatch(addChatAction(payload));
+			// dispatch(addChatAction(payload));
 			dispatch(hideLoading());
 		} catch (error) {
 			dispatch(showAlert(error.message + 'addChat2', ERROR));
+			dispatch(hideLoading());
+		}
+	};
+};
+
+export const createPrivateChat = (
+	chatInfo: PrivateChat
+): ThunkAction<void, RootState, unknown, Action> => {
+	return async (dispatch) => {
+		try {
+			dispatch(showLoading());
+
+			await db
+				.collection(PRIVATE_CHATS)
+				.doc(chatInfo.chatId)
+				.set(chatInfo)
+				.catch((e) => dispatch(showAlert(e.message, ERROR)));
+
+			// dispatch(createPrivateChatAction(chatInfo));
+			dispatch(hideLoading());
+		} catch (error) {
+			dispatch(showAlert(error.message, ERROR));
 			dispatch(hideLoading());
 		}
 	};

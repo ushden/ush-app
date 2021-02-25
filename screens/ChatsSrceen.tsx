@@ -1,4 +1,4 @@
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react';
 import {
@@ -12,12 +12,18 @@ import {
 } from 'react-native';
 import { Button, List, Avatar, ActivityIndicator } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchChats } from '../store/chats/chatsActions';
+import { fetchChats, fetchPrivateChats } from '../store/chats/chatsActions';
 import { RootState } from '../store/rootReducer';
 import { MaterialIcons } from '@expo/vector-icons';
 import { showAlert } from '../store/alert/alertActions';
-import { Chat, ERROR } from '../store/types';
-import { hideLoading, showLoading } from '../store/loading/loadingActions';
+import {
+	PublicChat,
+	ERROR,
+	PrivateChat,
+	PRIVATE_CHATS,
+	PUBLIC_CHATS,
+} from '../store/types';
+import { db } from '../libs/firebase';
 
 const renderSeparator = () => {
 	return (
@@ -34,18 +40,37 @@ const renderSeparator = () => {
 
 export const ChatsSrceen = () => {
 	const navigation = useNavigation();
-	const route = useRoute();
 	const dispatch = useDispatch();
-	const chats = useSelector((state: RootState) => state.chats.chats);
-	const loading = useSelector((state: RootState) => state.loading.loading);
+	const publicChats = useSelector(
+		(state: RootState) => state.chats.publicChats
+	);
+	const privateChats = useSelector(
+		(state: RootState) => state.chats.privateChats
+	);
 	const { id }: any = useSelector((state: RootState) => state.members.member);
+	const currentPrivateChats = privateChats.filter(
+		(chat) => chat.membersId[0] === id || chat.membersId[1] === id
+	);
+
+	const loading = useSelector((state: RootState) => state.loading.loading);
 
 	useEffect(() => {
-		dispatch(fetchChats());
-	}, [route]);
+		const unsubscribe = db.collection(PUBLIC_CHATS).onSnapshot(() => {
+			dispatch(fetchChats());
+		});
+		return () => unsubscribe();
+	}, []);
+
+	useEffect(() => {
+		const unsubscribe = db.collection(PRIVATE_CHATS).onSnapshot(() => {
+			dispatch(fetchPrivateChats());
+		});
+
+		return () => unsubscribe();
+	}, []);
 
 	const handlePress = () => {
-		const isCreate = chats.some((chat: Chat) => chat.chatId === id);
+		const isCreate = publicChats.some((chat: PublicChat) => chat.chatId === id);
 		if (isCreate) {
 			return dispatch(showAlert('Вы можете создать только один чат', ERROR));
 		} else {
@@ -67,11 +92,12 @@ export const ChatsSrceen = () => {
 					Создать чат
 				</Button>
 			</View>
+			<Text style={styles.сhatsList}>Публичные чаты</Text>
 			{loading ? (
 				<ActivityIndicator size='large' style={{ justifyContent: 'center' }} />
 			) : (
 				<FlatList
-					data={chats}
+					data={publicChats}
 					ItemSeparatorComponent={renderSeparator}
 					renderItem={({ item }) => (
 						<TouchableOpacity
@@ -82,6 +108,7 @@ export const ChatsSrceen = () => {
 							}>
 							<List.Item
 								title={item.chatName}
+								// description={() => publicChats.map(chat => <Text>{}</Text>)}
 								right={() => (
 									<MaterialIcons
 										name='keyboard-arrow-right'
@@ -95,6 +122,48 @@ export const ChatsSrceen = () => {
 										source={{
 											uri: item?.chatAvatar
 												? item?.chatAvatar
+												: 'https://lh3.googleusercontent.com/-JM2xsdjz2Bw/AAAAAAAAAAI/AAAAAAAAAAA/DVECr-jVlk4/photo.jpg',
+										}}
+									/>
+								)}
+							/>
+						</TouchableOpacity>
+					)}
+					keyExtractor={(item: PublicChat) => item.chatId}
+				/>
+			)}
+			<Text style={styles.сhatsList}>Личные переписки</Text>
+			{loading ? (
+				<ActivityIndicator size='large' style={{ justifyContent: 'center' }} />
+			) : (
+				<FlatList
+					data={currentPrivateChats}
+					renderItem={({ item }) => (
+						<TouchableOpacity
+							onPress={() =>
+								navigation.navigate('ChatSrceen', {
+									...item,
+								})
+							}>
+							<List.Item
+								title={
+									item.membersId[0] === id
+										? item.membersName[1]
+										: item.membersName[0]
+								}
+								right={() => (
+									<MaterialIcons
+										name='keyboard-arrow-right'
+										size={24}
+										color='gray'
+									/>
+								)}
+								left={() => (
+									<Avatar.Image
+										size={40}
+										source={{
+											uri: item?.membersPhotoUrl[0]
+												? item?.membersPhotoUrl[0]
 												: 'https://business.ucr.edu/sites/g/files/rcwecm2116/files/styles/form_preview/public/icon-group.png?itok=3LzNDSRI',
 										}}
 									/>
@@ -102,7 +171,7 @@ export const ChatsSrceen = () => {
 							/>
 						</TouchableOpacity>
 					)}
-					keyExtractor={(item: any) => item.chatId}
+					keyExtractor={(item: PrivateChat) => item.chatId}
 				/>
 			)}
 		</SafeAreaView>
@@ -115,4 +184,10 @@ const styles = StyleSheet.create({
 		backgroundColor: '#aa4848',
 	},
 	createChat: {},
+	сhatsList: {
+		color: '#aa4848',
+		fontWeight: '600',
+		textAlign: 'center',
+		fontSize: 20,
+	},
 });

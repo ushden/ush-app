@@ -37,13 +37,13 @@ export const MainScreen = () => {
 			tabBarIcon: ({ color }: any) => (
 				<FontAwesome5 name='home' size={22} color={color} />
 			),
-			tabBarColor: '#383e56',
+			tabBarColor: '#48aa48',
 		});
 	}, [navigation]);
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<StatusBar style='auto' />
+			<StatusBar style='dark' />
 			<ScrollView
 				refreshControl={
 					<RefreshControl

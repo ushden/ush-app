@@ -14,6 +14,7 @@ import { FlatList } from 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, Avatar, List } from 'react-native-paper';
 import { MaterialIcons } from '@expo/vector-icons';
+import { db } from '../libs/firebase';
 
 const renderSeparator = () => {
 	return (
@@ -32,10 +33,15 @@ export const UsersScreen = () => {
 	const navigation = useNavigation();
 	const dispatch = useDispatch();
 	const members = useSelector((state: RootState) => state.members.members);
+	const { id }: any = useSelector((state: RootState) => state.members.member);
 	const loading = useSelector((state: RootState) => state.loading.loading);
 
+	const membersWhithOutMe = members.filter((member) => member?.id !== id);
+
 	useEffect(() => {
-		dispatch(fetchMembers());
+		db.collection('users').onSnapshot(() => {
+			dispatch(fetchMembers());
+		});
 	}, []);
 
 	return (
@@ -50,7 +56,7 @@ export const UsersScreen = () => {
 				<ActivityIndicator size='large' style={{ paddingTop: 200 }} />
 			) : (
 				<FlatList
-					data={members}
+					data={membersWhithOutMe}
 					contentContainerStyle={{ justifyContent: 'center' }}
 					keyExtractor={(item) => item?.id}
 					ItemSeparatorComponent={renderSeparator}

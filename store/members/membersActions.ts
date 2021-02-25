@@ -50,7 +50,8 @@ export const signUp = (
 						name,
 						email: user?.user?.email,
 						id: user?.user?.uid,
-						photoUrl: user?.user?.photoURL,
+						photoUrl:
+							'https://lh3.googleusercontent.com/-JM2xsdjz2Bw/AAAAAAAAAAI/AAAAAAAAAAA/DVECr-jVlk4/photo.jpg',
 					};
 
 					dispatch(signUpAction(payload));

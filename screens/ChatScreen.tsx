@@ -1,6 +1,6 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
 	SafeAreaView,
 	View,
@@ -11,15 +11,13 @@ import {
 	ScrollView,
 	StyleSheet,
 	Platform,
-	Text,
 } from 'react-native';
 import { ActivityIndicator, TextInput } from 'react-native-paper';
-import { AntDesign } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
 import { db, serverTime } from '../libs/firebase';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/rootReducer';
-import { sendMessage, fetchMessages } from '../store/chats/messagesActions';
+import { sendMessage } from '../store/chats/messagesActions';
 import { ERROR, Message } from '../store/types';
 import { showAlert } from '../store/alert/alertActions';
 import { SingleMessage } from '../components/SingleMessage';
@@ -28,42 +26,37 @@ export const ChatScreen = () => {
 	const { params }: any = useRoute();
 	const navigation = useNavigation();
 	const member = useSelector((state: RootState) => state.members.member);
-
 	const dispatch = useDispatch();
+
+	const scrollView: any = useRef(null);
+
 	const [message, setMessage] = useState('');
 	const [data, setData] = useState([]);
 	const [loading, setLoading] = useState(true);
 
-	useEffect(() => {
+	const privateChatName = () => {
+		let name = '';
+
+		if (member?.id === params?.membersId[0]) {
+			return (name = params?.membersName[1]);
+		}
+
+		if (member?.id === params?.membersId[1]) {
+			return (name = params?.membersName[0]);
+		}
+
+		return name;
+	};
+
+	useLayoutEffect(() => {
 		navigation.setOptions({
-			title: params?.chatName,
-			headerTitleAlign: 'center',
-			headerStyle: { backgroundColor: '#aa4848' },
-			headerTitleStyle: { color: '#fff' },
-			headerLeftContainerStyle: {
-				alignItems: 'center',
-				justifyContent: 'center',
-			},
-			headerLeft: () => (
-				<TouchableOpacity onPress={() => navigation.goBack()}>
-					<AntDesign
-						name='arrowleft'
-						size={25}
-						color='#fff'
-						style={{ marginLeft: 15 }}
-					/>
-				</TouchableOpacity>
-			),
+			title: params?.chatName || privateChatName(),
 		});
 	}, []);
 
 	useEffect(() => {
-		dispatch(fetchMessages(params.chatId));
-	}, [params]);
-
-	useEffect(() => {
 		const unsubscribe = db
-			.collection('chats')
+			.collection(params._chatType)
 			.doc(params.chatId)
 			.collection('messages')
 			.orderBy('sendTime', 'asc')
@@ -84,8 +77,12 @@ export const ChatScreen = () => {
 	}, []);
 
 	useLayoutEffect(() => {
-		setTimeout(() => setLoading(false), 2000);
+		setTimeout(() => setLoading(false), 500);
 	}, []);
+
+	const contentSizeChangeHandle = () => {
+		scrollView.current.scrollToEnd({ animated: true });
+	};
 
 	const handlePress = () => {
 		if (message === '') {
@@ -97,14 +94,22 @@ export const ChatScreen = () => {
 			content: message,
 			chatId: params.chatId,
 			id: Date.now().toString(),
-			sendTime: serverTime,
+			sendTime: {
+				month: new Date().getMonth().toString(),
+				day: new Date().getDay().toString(),
+				hours: new Date().getHours().toString(),
+				minutes: new Date().getMinutes().toString(),
+			},
+			serverTime: serverTime,
 			memberName: member?.name,
 			memberAvatarUrl: member?.photoUrl,
 			memberEmail: member?.email,
 			memberId: member?.id,
 		};
 
-		dispatch(sendMessage(payload));
+		const chatType: string = params?._chatType;
+
+		dispatch(sendMessage(payload, chatType));
 		setMessage('');
 	};
 
@@ -117,20 +122,20 @@ export const ChatScreen = () => {
 					behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
 					style={styles.container}>
 					<>
-						{loading ? (
-							<ScrollView style={styles.messageArea}>
+						<ScrollView
+							style={styles.messageArea}
+							ref={scrollView}
+							onContentSizeChange={contentSizeChangeHandle}>
+							{loading ? (
 								<ActivityIndicator size='large' style={{ paddingTop: 100 }} />
-							</ScrollView>
-						) : (
-							<ScrollView style={styles.messageArea}>
-								{data.map((message: Message) => {
-									if (data.length === 0) {
-										return <Text>Сообщений пока нету, напиши что-то</Text>;
-									}
-									return <SingleMessage {...message} key={message.id} />;
-								})}
-							</ScrollView>
-						)}
+							) : (
+								<View>
+									{data.map((message: Message) => {
+										return <SingleMessage {...message} key={message.id} />;
+									})}
+								</View>
+							)}
+						</ScrollView>
 						<View style={styles.inputContainer}>
 							<TextInput
 								mode='flat'
@@ -158,6 +163,7 @@ const styles = StyleSheet.create({
 	messageArea: {
 		flex: 1,
 		width: '100%',
+		backgroundColor: '#ede7f6',
 	},
 	inputContainer: {
 		flexDirection: 'row',
