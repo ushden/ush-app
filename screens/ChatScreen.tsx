@@ -1,26 +1,31 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, {
+	useEffect,
+	useLayoutEffect,
+	useState,
+	useCallback,
+} from 'react';
 import {
 	SafeAreaView,
-	View,
 	TouchableWithoutFeedback,
 	Keyboard,
-	TouchableOpacity,
 	KeyboardAvoidingView,
-	ScrollView,
 	StyleSheet,
 	Platform,
+	View,
+	Text,
 } from 'react-native';
-import { ActivityIndicator, TextInput } from 'react-native-paper';
-import { FontAwesome } from '@expo/vector-icons';
-import { db, serverTime } from '../libs/firebase';
+import { db } from '../libs/firebase';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/rootReducer';
-import { sendMessage } from '../store/chats/messagesActions';
+import { sendMessage } from '../store/chats/chatsActions';
 import { ERROR, Message } from '../store/types';
 import { showAlert } from '../store/alert/alertActions';
-import { SingleMessage } from '../components/SingleMessage';
+import { GiftedChat, IMessage, Send, User } from 'react-native-gifted-chat';
+import { ActivityIndicator } from 'react-native-paper';
+import { FontAwesome } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export const ChatScreen = () => {
 	const { params }: any = useRoute();
@@ -28,11 +33,7 @@ export const ChatScreen = () => {
 	const member = useSelector((state: RootState) => state.members.member);
 	const dispatch = useDispatch();
 
-	const scrollView: any = useRef(null);
-
-	const [message, setMessage] = useState('');
-	const [data, setData] = useState([]);
-	const [loading, setLoading] = useState(true);
+	const [messages, setMessages] = useState([]);
 
 	const privateChatName = () => {
 		let name = '';
@@ -59,7 +60,8 @@ export const ChatScreen = () => {
 			.collection(params._chatType)
 			.doc(params.chatId)
 			.collection('messages')
-			.orderBy('sendTime', 'asc')
+			.orderBy('createdAt', 'desc')
+			.limit(20)
 			.onSnapshot(
 				(querySnapshot) => {
 					const data: any = [];
@@ -68,7 +70,20 @@ export const ChatScreen = () => {
 						data.push(doc.data());
 					});
 
-					setData(data);
+					let messages = data.map((message: Message) => {
+						return {
+							_id: message.id,
+							text: message.content,
+							createdAt: Number(message.createdAt),
+							user: {
+								_id: message.member?.id,
+								name: message.member?.name,
+								avatar: message.member?.photoUrl,
+							},
+						};
+					});
+
+					setMessages(messages);
 				},
 				(error) => dispatch(showAlert(error.message, ERROR))
 			);
@@ -76,41 +91,51 @@ export const ChatScreen = () => {
 		return () => unsubscribe();
 	}, []);
 
-	useLayoutEffect(() => {
-		setTimeout(() => setLoading(false), 500);
+	const onSend = useCallback((messages = []) => {
+		setMessages((previousMessages) =>
+			GiftedChat.append(previousMessages, messages)
+		);
+		messages.forEach((message: IMessage) => {
+			const chatType: string = params?._chatType;
+			const payload: Message = {
+				content: message.text,
+				chatId: params.chatId,
+				id: message._id,
+				createdAt: message.createdAt,
+				member: {
+					name: member?.name,
+					id: member?.id,
+					photoUrl: member?.photoUrl,
+					email: member?.email,
+				},
+			};
+
+			dispatch(sendMessage(payload, chatType));
+		});
 	}, []);
 
-	const contentSizeChangeHandle = () => {
-		scrollView.current.scrollToEnd({ animated: true });
+	const onPressAvatar = (user: User) => {};
+
+	const renderSend = (props: any) => {
+		return (
+			<Send {...props}>
+				<View style={{ marginRight: 10, marginBottom: 10 }}>
+					<FontAwesome name='send-o' size={26} color='#aa4848' />
+				</View>
+			</Send>
+		);
 	};
 
-	const handlePress = () => {
-		if (message === '') {
-			return dispatch(showAlert('Введите сообщение', ERROR));
-		}
-		Keyboard.dismiss();
-
-		const payload: Message = {
-			content: message,
-			chatId: params.chatId,
-			id: Date.now().toString(),
-			sendTime: {
-				month: new Date().getMonth().toString(),
-				day: new Date().getDay().toString(),
-				hours: new Date().getHours().toString(),
-				minutes: new Date().getMinutes().toString(),
-			},
-			serverTime: serverTime,
-			memberName: member?.name,
-			memberAvatarUrl: member?.photoUrl,
-			memberEmail: member?.email,
-			memberId: member?.id,
-		};
-
-		const chatType: string = params?._chatType;
-
-		dispatch(sendMessage(payload, chatType));
-		setMessage('');
+	const renderScrollToBottomComponet = () => {
+		return (
+			<View>
+				<MaterialCommunityIcons
+					name='arrow-down-drop-circle-outline'
+					size={24}
+					color='black'
+				/>
+			</View>
+		);
 	};
 
 	return (
@@ -118,37 +143,30 @@ export const ChatScreen = () => {
 			<StatusBar style='light' />
 			<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
 				<KeyboardAvoidingView
-					keyboardVerticalOffset={90}
+					keyboardVerticalOffset={80}
 					behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
 					style={styles.container}>
 					<>
-						<ScrollView
-							style={styles.messageArea}
-							ref={scrollView}
-							onContentSizeChange={contentSizeChangeHandle}>
-							{loading ? (
+						<GiftedChat
+							messages={messages}
+							onSend={(messages) => onSend(messages)}
+							user={{
+								_id: member?.id,
+								name: member?.name,
+								avatar: member?.photoUrl,
+							}}
+							placeholder='Сообщение'
+							// isTyping={true}
+							// loadEarlier={true}
+							isLoadingEarlier={true}
+							infiniteScroll={true}
+							renderLoading={() => (
 								<ActivityIndicator size='large' style={{ paddingTop: 100 }} />
-							) : (
-								<View>
-									{data.map((message: Message) => {
-										return <SingleMessage {...message} key={message.id} />;
-									})}
-								</View>
 							)}
-						</ScrollView>
-						<View style={styles.inputContainer}>
-							<TextInput
-								mode='flat'
-								label='Сообщение'
-								style={styles.input}
-								underlineColor='transparent'
-								value={message}
-								onChangeText={(text) => setMessage(text)}
-							/>
-							<TouchableOpacity onPress={handlePress}>
-								<FontAwesome name='send-o' size={30} color='blue' />
-							</TouchableOpacity>
-						</View>
+							onPressAvatar={onPressAvatar}
+							renderSend={renderSend}
+							scrollToBottomComponent={renderScrollToBottomComponet}
+						/>
 					</>
 				</KeyboardAvoidingView>
 			</TouchableWithoutFeedback>
@@ -159,27 +177,5 @@ export const ChatScreen = () => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-	},
-	messageArea: {
-		flex: 1,
-		width: '100%',
-		backgroundColor: '#ede7f6',
-	},
-	inputContainer: {
-		flexDirection: 'row',
-		backgroundColor: '#fff',
-		alignItems: 'center',
-		width: '100%',
-		justifyContent: 'space-between',
-		paddingRight: 15,
-	},
-	input: {
-		bottom: 0,
-		flex: 1,
-		marginRight: 15,
-		borderColor: 'transparent',
-		backgroundColor: '#fff',
-		borderWidth: 1,
-		borderRadius: 30,
 	},
 });

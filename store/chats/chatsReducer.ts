@@ -1,10 +1,10 @@
 import {
-	ADD_CHAT,
 	chatsAction,
 	FETCH_PRIVATE_CHATS,
-	CREATE_PRIVATE_CHAT,
+	Chats,
+	FETCH_PUBLIC_CHATS,
+	FETCH_PUBLIC_MESSAGE,
 } from './../types';
-import { Chats, FETCH_PUBLIC_CHATS } from '../types';
 
 const initialState: Chats = {
 	publicChats: [
@@ -26,6 +26,34 @@ const initialState: Chats = {
 			membersId: [],
 		},
 	],
+	publicMessages: [
+		{
+			content: '',
+			id: '',
+			chatId: '',
+			createdAt: '',
+			member: {
+				name: '',
+				id: '',
+				photoUrl: '',
+				email: '',
+			},
+		},
+	],
+	privateMessages: [
+		{
+			content: '',
+			id: '',
+			chatId: '',
+			createdAt: '',
+			member: {
+				name: '',
+				id: '',
+				photoUrl: '',
+				email: '',
+			},
+		},
+	],
 };
 
 export const chatsReducer = (
@@ -35,21 +63,13 @@ export const chatsReducer = (
 	switch (action.type) {
 		case FETCH_PUBLIC_CHATS:
 			return { ...state, publicChats: [...action.payload] };
-		// case ADD_CHAT:
-		// 	return {
-		// 		...state,
-		// 		publicChats: [...state.publicChats, action.payload],
-		// 	};
 		case FETCH_PRIVATE_CHATS:
 			return {
 				...state,
 				privateChats: [...action.payload],
 			};
-		// case CREATE_PRIVATE_CHAT:
-		// 	return {
-		// 		...state,
-		// 		privateChats: [...state.privateChats, action.payload],
-		// 	};
+		case FETCH_PUBLIC_MESSAGE:
+			return { ...state };
 		default:
 			return state;
 	}

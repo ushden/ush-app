@@ -49,8 +49,8 @@ export const signUp = (
 					const payload: Member = {
 						name,
 						email: user?.user?.email,
-						id: user?.user?.uid,
-						photoUrl:
+						_id: user?.user?.uid,
+						avatar:
 							'https://lh3.googleusercontent.com/-JM2xsdjz2Bw/AAAAAAAAAAI/AAAAAAAAAAA/DVECr-jVlk4/photo.jpg',
 					};
 
@@ -81,8 +81,8 @@ export const signIn = (
 						const payload = {
 							name: user.user?.displayName,
 							email: user.user?.email,
-							id: user.user?.uid,
-							photoURL: user.user?.photoURL,
+							_id: user.user?.uid,
+							avatar: user.user?.photoURL,
 						};
 
 						dispatch(signInAction(payload));

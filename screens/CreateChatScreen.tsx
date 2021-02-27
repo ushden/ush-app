@@ -25,7 +25,6 @@ export const CreateChatScreen = () => {
 	const handlePress = () => {
 		dispatch(addChat(chatName));
 		navigation.goBack();
-		dispatch(fetchChats());
 	};
 
 	useEffect(() => {

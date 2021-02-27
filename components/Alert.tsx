@@ -2,11 +2,12 @@ import React from 'react';
 import { Snackbar } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { hideAlert } from '../store/alert/alertActions';
+import { RootState } from '../store/rootReducer';
 
 export const Alert = () => {
 	const dispatch = useDispatch();
 	const { displayAlert, message, type } = useSelector(
-		(state: any) => state.alert
+		(state: RootState) => state.alert
 	);
 
 	return (

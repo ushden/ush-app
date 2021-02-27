@@ -24,19 +24,8 @@ import {
 	PUBLIC_CHATS,
 } from '../store/types';
 import { db } from '../libs/firebase';
-
-const renderSeparator = () => {
-	return (
-		<View
-			style={{
-				height: 1.5,
-				width: '86%',
-				backgroundColor: '#aa4848',
-				marginLeft: '14%',
-			}}
-		/>
-	);
-};
+import { PrivateChats } from '../components/PrivateChats';
+import { PublicChats } from '../components/PublicChats';
 
 export const ChatsSrceen = () => {
 	const navigation = useNavigation();
@@ -44,20 +33,14 @@ export const ChatsSrceen = () => {
 	const publicChats = useSelector(
 		(state: RootState) => state.chats.publicChats
 	);
-	const privateChats = useSelector(
-		(state: RootState) => state.chats.privateChats
-	);
-	const { id }: any = useSelector((state: RootState) => state.members.member);
-	const currentPrivateChats = privateChats.filter(
-		(chat) => chat.membersId[0] === id || chat.membersId[1] === id
-	);
 
-	const loading = useSelector((state: RootState) => state.loading.loading);
+	const { id }: any = useSelector((state: RootState) => state.members.member);
 
 	useEffect(() => {
 		const unsubscribe = db.collection(PUBLIC_CHATS).onSnapshot(() => {
 			dispatch(fetchChats());
 		});
+
 		return () => unsubscribe();
 	}, []);
 
@@ -93,87 +76,9 @@ export const ChatsSrceen = () => {
 				</Button>
 			</View>
 			<Text style={styles.сhatsList}>Публичные чаты</Text>
-			{loading ? (
-				<ActivityIndicator size='large' style={{ justifyContent: 'center' }} />
-			) : (
-				<FlatList
-					data={publicChats}
-					ItemSeparatorComponent={renderSeparator}
-					renderItem={({ item }) => (
-						<TouchableOpacity
-							onPress={() =>
-								navigation.navigate('ChatSrceen', {
-									...item,
-								})
-							}>
-							<List.Item
-								title={item.chatName}
-								// description={() => publicChats.map(chat => <Text>{}</Text>)}
-								right={() => (
-									<MaterialIcons
-										name='keyboard-arrow-right'
-										size={24}
-										color='gray'
-									/>
-								)}
-								left={() => (
-									<Avatar.Image
-										size={40}
-										source={{
-											uri: item?.chatAvatar
-												? item?.chatAvatar
-												: 'https://lh3.googleusercontent.com/-JM2xsdjz2Bw/AAAAAAAAAAI/AAAAAAAAAAA/DVECr-jVlk4/photo.jpg',
-										}}
-									/>
-								)}
-							/>
-						</TouchableOpacity>
-					)}
-					keyExtractor={(item: PublicChat) => item.chatId}
-				/>
-			)}
+			<PublicChats />
 			<Text style={styles.сhatsList}>Личные переписки</Text>
-			{loading ? (
-				<ActivityIndicator size='large' style={{ justifyContent: 'center' }} />
-			) : (
-				<FlatList
-					data={currentPrivateChats}
-					renderItem={({ item }) => (
-						<TouchableOpacity
-							onPress={() =>
-								navigation.navigate('ChatSrceen', {
-									...item,
-								})
-							}>
-							<List.Item
-								title={
-									item.membersId[0] === id
-										? item.membersName[1]
-										: item.membersName[0]
-								}
-								right={() => (
-									<MaterialIcons
-										name='keyboard-arrow-right'
-										size={24}
-										color='gray'
-									/>
-								)}
-								left={() => (
-									<Avatar.Image
-										size={40}
-										source={{
-											uri: item?.membersPhotoUrl[0]
-												? item?.membersPhotoUrl[0]
-												: 'https://business.ucr.edu/sites/g/files/rcwecm2116/files/styles/form_preview/public/icon-group.png?itok=3LzNDSRI',
-										}}
-									/>
-								)}
-							/>
-						</TouchableOpacity>
-					)}
-					keyExtractor={(item: PrivateChat) => item.chatId}
-				/>
-			)}
+			<PrivateChats />
 		</SafeAreaView>
 	);
 };

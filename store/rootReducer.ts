@@ -1,4 +1,3 @@
-import { messagesReducer } from './chats/messagesReducer';
 import { chatsReducer } from './chats/chatsReducer';
 import { alertReducer } from './alert/alertReducer';
 import { membersReducer } from './members/membersReducer';
@@ -12,7 +11,6 @@ const rootReducer = combineReducers({
 	loading: loadingReducer,
 	alert: alertReducer,
 	chats: chatsReducer,
-	messages: messagesReducer,
 });
 
 const store = createStore(

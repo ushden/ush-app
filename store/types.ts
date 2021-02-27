@@ -1,4 +1,3 @@
-import { serverTime } from './../libs/firebase';
 import firebase from 'firebase';
 
 export const SIGN_UP_MEMBER = 'SIGN_UP_MEMBER';
@@ -12,51 +11,29 @@ export const GET_MEMBER = 'GET_MEMBER';
 export const FETCH_MEMBERS = 'FETCH_MEMBERS';
 export const FETCH_PUBLIC_CHATS = 'FETCH_PUBLIC_CHATS';
 export const FETCH_PRIVATE_CHATS = 'FETCH_PRIVATE_CHATS';
-export const ADD_CHAT = 'ADD_CHAT';
-export const SEND_MESSAGE = 'SEND_MESSAGE';
-export const FETCH_MESSAGE = 'FETCH_MESSAGE';
-export const CREATE_PRIVATE_CHAT = 'CREATE_PRIVATE_CHAT';
+// export const ADD_CHAT = 'ADD_CHAT';
+// export const SEND_MESSAGE = 'SEND_MESSAGE';
+export const FETCH_PUBLIC_MESSAGE = 'FETCH_PUBLIC_MESSAGE';
+// export const CREATE_PRIVATE_CHAT = 'CREATE_PRIVATE_CHAT';
 
 export const ERROR = 'red';
 export const SUCCSSES = 'green';
 
 export const PRIVATE_CHATS = 'privateChats';
 export const PUBLIC_CHATS = 'publicChats';
+export const MESSAGES = 'messages';
 
 export interface Message {
 	content: string;
-	id: string;
+	id: string | number;
 	chatId: string;
-	sendTime: Time;
-	serverTime: any;
-	memberName: string;
-	memberAvatarUrl: string;
-	memberEmail: string;
-	memberId: string;
+	createdAt: string | Date | number;
+	member: Member;
 }
-
-export interface Time {
-	month: string;
-	day: string;
-	hours: string;
-	minutes: string;
-}
-
-export interface Messages {
-	messages: Array<Message>;
-}
-
-interface sendMessageAction {
-	type: typeof SEND_MESSAGE;
-	payload: Message;
-}
-
-interface updateMessageAction {
-	type: typeof FETCH_MESSAGE;
+interface updatePublicMessageAction {
+	type: typeof FETCH_PUBLIC_MESSAGE;
 	payload: any;
 }
-
-export type MessageActions = sendMessageAction | updateMessageAction;
 
 export interface PublicChat {
 	chatId: string;
@@ -78,6 +55,8 @@ export interface PrivateChat {
 export interface Chats {
 	publicChats: Array<PublicChat>;
 	privateChats: Array<PrivateChat>;
+	publicMessages: Array<Message>;
+	privateMessages: Array<Message>;
 }
 
 interface fetchChatsAction {
@@ -90,26 +69,15 @@ interface fetchPrivateChats {
 	payload: Array<PrivateChat>;
 }
 
-interface addChatAction {
-	type: typeof ADD_CHAT;
-	payload: PublicChat;
-}
-
-interface createPrivateChat {
-	type: typeof CREATE_PRIVATE_CHAT;
-	payload: PrivateChat;
-}
-
 export type chatsAction =
 	| fetchChatsAction
-	| addChatAction
 	| fetchPrivateChats
-	| createPrivateChat;
+	| updatePublicMessageAction;
 
 export type Member =
 	| {
 			name: string | null | undefined;
-			id: string | undefined;
+			id: string | undefined | number;
 			email: string | null | undefined;
 			photoUrl?: string | null | undefined;
 	  }
