@@ -27,6 +27,7 @@ export const ChatNavigation = () => {
 					headerTitleAlign: 'center',
 					headerStyle: { backgroundColor: '#aa4848' },
 					headerTitleStyle: { color: '#fff' },
+					headerStatusBarHeight: 10,
 					headerLeftContainerStyle: {
 						alignItems: 'center',
 						justifyContent: 'center',

@@ -14,9 +14,8 @@ import { ActivityIndicator, Button } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { FontAwesome5 } from '@expo/vector-icons';
 
-import { auth } from '../libs/firebase';
 import { RootState } from '../store/rootReducer';
-import { getMember } from '../store/members/membersActions';
+import { getMember, signOut } from '../store/members/membersActions';
 
 export const MainScreen = () => {
 	const navigation = useNavigation();
@@ -58,7 +57,7 @@ export const MainScreen = () => {
 						<Text style={{ paddingTop: 200 }}>
 							Name: {name} Email: {email} ID: {id}
 						</Text>
-						<Button mode='contained' onPress={() => auth.signOut()}>
+						<Button mode='contained' onPress={() => dispatch(signOut())}>
 							Out
 						</Button>
 					</View>

@@ -1,12 +1,31 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import React from 'react';
-import { ActivityIndicator, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { FlatList, TouchableOpacity } from 'react-native-gesture-handler';
 import { List, Avatar } from 'react-native-paper';
 import { useSelector } from 'react-redux';
+import { db } from '../libs/firebase';
 import { RootState } from '../store/rootReducer';
-import { PrivateChat } from '../store/types';
+import {
+	DEFAULT_AVATAR_URL,
+	MESSAGES,
+	PrivateChat,
+	PRIVATE_CHATS,
+} from '../store/types';
+
+const renderSeparator = () => {
+	return (
+		<View
+			style={{
+				height: 1.5,
+				width: '86%',
+				backgroundColor: '#lightgray',
+				marginLeft: '14%',
+			}}
+		/>
+	);
+};
 
 export const PrivateChats = () => {
 	const navigation = useNavigation();
@@ -28,19 +47,57 @@ export const PrivateChats = () => {
 						fontWeight: '400',
 						color: 'gray',
 					}}>
-					Нету личных переписок.
+					Нет личных переписок.
 				</Text>
 			</View>
 		);
 	}
+
+	const showLastMessage = (params: any, item: PrivateChat) => {
+		const [lastMessage, setLastMessage] = useState({
+			content: '',
+			createdAt: '',
+			member: { name: '' },
+		});
+
+		useEffect(() => {
+			const unsubscribe = db
+				.collection(PRIVATE_CHATS)
+				.doc(item.chatId)
+				.collection(MESSAGES)
+				.limit(1)
+				.orderBy('createdAt', 'desc')
+				.onSnapshot((querySnapshot) => {
+					querySnapshot.forEach((doc) => {
+						const data: any = doc.data();
+						setLastMessage(data);
+					});
+				});
+			return () => unsubscribe();
+		}, [lastMessage]);
+
+		return (
+			<View>
+				<Text
+					style={{ color: params.color, fontSize: 11 }}
+					ellipsizeMode='tail'>
+					{`${lastMessage.member.name}: ${lastMessage.content}`}
+				</Text>
+			</View>
+		);
+	};
 
 	return loading ? (
 		<ActivityIndicator size='large' style={{ justifyContent: 'center' }} />
 	) : (
 		<FlatList
 			data={privateChats}
+			ItemSeparatorComponent={renderSeparator}
+			style={styles.list}
+			contentContainerStyle={styles.listContainer}
 			renderItem={({ item }) => (
 				<TouchableOpacity
+					activeOpacity={0.8}
 					onPress={() =>
 						navigation.navigate('ChatSrceen', {
 							...item,
@@ -52,11 +109,14 @@ export const PrivateChats = () => {
 								? item.membersName[1]
 								: item.membersName[0]
 						}
+						description={(params) => showLastMessage(params, item)}
+						style={styles.listItem}
 						right={() => (
 							<MaterialIcons
 								name='keyboard-arrow-right'
 								size={24}
 								color='gray'
+								style={{ paddingTop: 10 }}
 							/>
 						)}
 						left={() => (
@@ -65,7 +125,7 @@ export const PrivateChats = () => {
 								source={{
 									uri: item?.membersPhotoUrl[0]
 										? item?.membersPhotoUrl[0]
-										: 'https://business.ucr.edu/sites/g/files/rcwecm2116/files/styles/form_preview/public/icon-group.png?itok=3LzNDSRI',
+										: DEFAULT_AVATAR_URL,
 								}}
 							/>
 						)}
@@ -76,3 +136,15 @@ export const PrivateChats = () => {
 		/>
 	);
 };
+
+const styles = StyleSheet.create({
+	listItem: {
+		marginBottom: 5,
+		borderBottomWidth: 1,
+		borderBottomColor: 'lightgray',
+	},
+	listContainer: {
+		justifyContent: 'center',
+	},
+	list: {},
+});

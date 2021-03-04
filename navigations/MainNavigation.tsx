@@ -1,10 +1,10 @@
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import React from 'react';
 import { MainScreen } from '../screens/MainScreen';
-import { ProfileScreen } from '../screens/MyProfileScreen';
-import { UsersScreen } from '../screens/MembersListScreen';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { ChatNavigation } from './ChatNavigation';
+import { ProfileNavigation } from './ProfileNavigation';
+import { MembersNavigation } from './MembersNavigation';
 
 const MainNavigationStack = createMaterialBottomTabNavigator();
 
@@ -24,8 +24,8 @@ export const MainNavigation = () => {
 				}}
 			/>
 			<MainNavigationStack.Screen
-				name='users'
-				component={UsersScreen}
+				name='members'
+				component={MembersNavigation}
 				options={{
 					tabBarLabel: 'Члены',
 					tabBarIcon: ({ color }: any) => (
@@ -36,7 +36,7 @@ export const MainNavigation = () => {
 			/>
 			<MainNavigationStack.Screen
 				name='profile'
-				component={ProfileScreen}
+				component={ProfileNavigation}
 				options={{
 					tabBarLabel: 'Профиль',
 					tabBarIcon: ({ color }: any) => (

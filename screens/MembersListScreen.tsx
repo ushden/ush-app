@@ -1,20 +1,22 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
 	SafeAreaView,
 	StatusBar as StatusBarNative,
 	View,
 	TouchableOpacity,
 	RefreshControl,
+	Text,
 } from 'react-native';
 import { fetchMembers } from '../store/members/membersActions';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/rootReducer';
 import { FlatList } from 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, Avatar, List } from 'react-native-paper';
+import { ActivityIndicator, Avatar, List, Searchbar } from 'react-native-paper';
 import { MaterialIcons } from '@expo/vector-icons';
 import { db } from '../libs/firebase';
+import { DEFAULT_AVATAR_URL, Member } from '../store/types';
 
 const renderSeparator = () => {
 	return (
@@ -29,20 +31,28 @@ const renderSeparator = () => {
 	);
 };
 
-export const UsersScreen = () => {
+export const MembersScreen = () => {
 	const navigation = useNavigation();
 	const dispatch = useDispatch();
-	const members = useSelector((state: RootState) => state.members.members);
 	const { id }: any = useSelector((state: RootState) => state.members.member);
+	const members = useSelector(
+		(state: RootState) => state.members.members
+	).filter((member) => member?.id !== id);
+
 	const loading = useSelector((state: RootState) => state.loading.loading);
 
-	const membersWhithOutMe = members.filter((member) => member?.id !== id);
+	const [searchQuery, setSearchQuery] = useState('');
 
 	useEffect(() => {
-		db.collection('users').onSnapshot(() => {
+		const unsubscribe = db.collection('users').onSnapshot(() => {
 			dispatch(fetchMembers());
 		});
+		return () => unsubscribe();
 	}, []);
+
+	const handleChange = (query: string) => {
+		setSearchQuery(query);
+	};
 
 	return (
 		<SafeAreaView>
@@ -56,10 +66,28 @@ export const UsersScreen = () => {
 				<ActivityIndicator size='large' style={{ paddingTop: 200 }} />
 			) : (
 				<FlatList
-					data={membersWhithOutMe}
+					data={members.filter((member) => member?.name.includes(searchQuery))}
 					contentContainerStyle={{ justifyContent: 'center' }}
 					keyExtractor={(item) => item?.id}
 					ItemSeparatorComponent={renderSeparator}
+					ListEmptyComponent={
+						<Text
+							style={{
+								textAlign: 'center',
+								paddingVertical: 30,
+								color: 'gray',
+							}}>
+							Членов не найдено
+						</Text>
+					}
+					ListHeaderComponent={
+						<Searchbar
+							placeholder='Найти члена'
+							value={searchQuery}
+							onChangeText={handleChange}
+							style={{ shadowColor: 'transparent', borderWidth: 0 }}
+						/>
+					}
 					refreshControl={
 						<RefreshControl
 							refreshing={loading}
@@ -71,7 +99,7 @@ export const UsersScreen = () => {
 							<TouchableOpacity
 								activeOpacity={0.5}
 								onPress={() =>
-									navigation.navigate('UserProfileScreen', { ...item })
+									navigation.navigate('MemberProfile', { ...item })
 								}>
 								<List.Item
 									title={item?.name}
@@ -82,7 +110,7 @@ export const UsersScreen = () => {
 											source={{
 												uri: item?.photoUrl
 													? item?.photoUrl
-													: 'https://lh3.googleusercontent.com/-JM2xsdjz2Bw/AAAAAAAAAAI/AAAAAAAAAAA/DVECr-jVlk4/photo.jpg',
+													: DEFAULT_AVATAR_URL,
 											}}
 										/>
 									)}

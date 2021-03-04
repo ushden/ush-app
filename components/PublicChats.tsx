@@ -1,12 +1,13 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 import { FlatList, TouchableOpacity } from 'react-native-gesture-handler';
 import { List, Avatar } from 'react-native-paper';
 import { useSelector } from 'react-redux';
+import { db } from '../libs/firebase';
 import { RootState } from '../store/rootReducer';
-import { PublicChat } from '../store/types';
+import { MESSAGES, PublicChat, PUBLIC_CHATS } from '../store/types';
 
 const renderSeparator = () => {
 	return (
@@ -28,8 +29,6 @@ export const PublicChats = () => {
 		(state: RootState) => state.chats.publicChats
 	);
 
-	useEffect(() => {});
-
 	if (publicChats.length === 0) {
 		return (
 			<View>
@@ -45,6 +44,35 @@ export const PublicChats = () => {
 			</View>
 		);
 	}
+
+	// const showLastMessage = (params: any, item: PublicChat) => {
+	// 	const [lastMessage, setLastMessage] = useState({
+	// 		content: '',
+	// 		member: { name: '' },
+	// 	});
+
+	// 	useEffect(() => {
+	// 		const unsubscribe = db
+	// 			.collection(PUBLIC_CHATS)
+	// 			.doc(item.chatId)
+	// 			.collection(MESSAGES)
+	// 			.limit(1)
+	// 			.orderBy('createdAt', 'desc')
+	// 			.onSnapshot((querySnapshot) => {
+	// 				querySnapshot.forEach((doc) => {
+	// 					const data: any = doc.data();
+	// 					setLastMessage(data);
+	// 				});
+	// 			});
+	// 		return () => unsubscribe();
+	// 	}, [lastMessage]);
+	// 	return (
+	// 		<Text style={{ color: params.color, fontSize: 11 }} ellipsizeMode='tail'>
+	// 			{`${lastMessage.member.name}: ${lastMessage.content}`}
+	// 		</Text>
+	// 	);
+	// };
+
 	return loading ? (
 		<ActivityIndicator size='large' style={{ justifyContent: 'center' }} />
 	) : (
@@ -60,7 +88,7 @@ export const PublicChats = () => {
 					}>
 					<List.Item
 						title={item.chatName}
-						// description={() => publicChats.map(chat => <Text>{}</Text>)}
+						// description={(params) => showLastMessage(params, item)}
 						right={() => (
 							<MaterialIcons
 								name='keyboard-arrow-right'

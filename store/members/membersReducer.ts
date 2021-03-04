@@ -6,6 +6,7 @@ import {
 	SIGN_IN_MEMBER,
 	MembersState,
 	FETCH_MEMBERS,
+	SIGN_OUT,
 } from '../types';
 
 const initialState: MembersState = {
@@ -14,6 +15,7 @@ const initialState: MembersState = {
 		email: '',
 		photoUrl: '',
 		id: '',
+		about: '',
 	},
 	members: [],
 };
@@ -45,6 +47,8 @@ export const membersReducer = (
 			};
 		case FETCH_MEMBERS:
 			return { ...state, members: [...action.payload] };
+		case SIGN_OUT:
+			return initialState;
 		default:
 			return state;
 	}

@@ -11,10 +11,8 @@ export const GET_MEMBER = 'GET_MEMBER';
 export const FETCH_MEMBERS = 'FETCH_MEMBERS';
 export const FETCH_PUBLIC_CHATS = 'FETCH_PUBLIC_CHATS';
 export const FETCH_PRIVATE_CHATS = 'FETCH_PRIVATE_CHATS';
-// export const ADD_CHAT = 'ADD_CHAT';
-// export const SEND_MESSAGE = 'SEND_MESSAGE';
+export const SIGN_OUT = 'SIGN_OUT';
 export const FETCH_PUBLIC_MESSAGE = 'FETCH_PUBLIC_MESSAGE';
-// export const CREATE_PRIVATE_CHAT = 'CREATE_PRIVATE_CHAT';
 
 export const ERROR = 'red';
 export const SUCCSSES = 'green';
@@ -23,11 +21,13 @@ export const PRIVATE_CHATS = 'privateChats';
 export const PUBLIC_CHATS = 'publicChats';
 export const MESSAGES = 'messages';
 
+export const DEFAULT_AVATAR_URL =
+	'https://www.pinclipart.com/picdir/big/133-1331433_free-user-avatar-icons-happy-flat-design-png.png';
 export interface Message {
 	content: string;
 	id: string | number;
 	chatId: string;
-	createdAt: string | Date | number;
+	createdAt: string | Date;
 	member: Member;
 }
 interface updatePublicMessageAction {
@@ -80,6 +80,7 @@ export type Member =
 			id: string | undefined | number;
 			email: string | null | undefined;
 			photoUrl?: string | null | undefined;
+			about?: string | undefined | null;
 	  }
 	| firebase.firestore.DocumentData
 	| undefined;
@@ -87,6 +88,10 @@ export type Member =
 export interface MembersState {
 	members: Array<Member>;
 	member: Member;
+}
+
+interface signOutAction {
+	type: typeof SIGN_OUT;
 }
 
 interface signUpAction {
@@ -119,7 +124,8 @@ export type MembersActions =
 	| setMemberAction
 	| signInAction
 	| getMemberAction
-	| fetchMembersAction;
+	| fetchMembersAction
+	| signOutAction;
 
 export interface LoadingState {
 	loading: boolean;

@@ -1,10 +1,12 @@
+import { SIGN_OUT, SUCCSSES } from './../types';
 import { hideLoading } from '../loading/loadingActions';
 import { showLoading } from '../loading/loadingActions';
 import { RootState } from '../rootReducer';
 import { showAlert } from '../alert/alertActions';
-import { auth, db } from '../../libs/firebase';
+import { auth, db, storage } from '../../libs/firebase';
 import { ThunkAction } from 'redux-thunk';
 import { Action } from 'redux';
+
 import {
 	ERROR,
 	SIGN_IN_MEMBER,
@@ -23,11 +25,24 @@ const fetchMembersAction = (payload: Member) => ({
 	type: FETCH_MEMBERS,
 	payload,
 });
+const signOutAction = () => ({ type: SIGN_OUT });
+
+export const signOut = (): ThunkAction<void, RootState, unknown, Action> => {
+	return async (dispatch) => {
+		try {
+			await auth.signOut();
+			dispatch(signOutAction());
+		} catch (error) {
+			dispatch(showAlert(error.code, ERROR));
+		}
+	};
+};
 
 export const signUp = (
 	name: string,
 	email: string,
-	password: any
+	password: any,
+	photoURL: string
 ): ThunkAction<void, RootState, unknown, Action> => {
 	return async (dispatch) => {
 		try {
@@ -37,25 +52,25 @@ export const signUp = (
 				.createUserWithEmailAndPassword(email, password)
 				.then((user) => {
 					if (user) {
-						user.user?.updateProfile({
-							displayName: name,
-							photoURL:
-								'https://lh3.googleusercontent.com/-JM2xsdjz2Bw/AAAAAAAAAAI/AAAAAAAAAAA/DVECr-jVlk4/photo.jpg',
-						});
-						return user;
-					}
-				})
-				.then((user) => {
-					const payload: Member = {
-						name,
-						email: user?.user?.email,
-						_id: user?.user?.uid,
-						avatar:
-							'https://lh3.googleusercontent.com/-JM2xsdjz2Bw/AAAAAAAAAAI/AAAAAAAAAAA/DVECr-jVlk4/photo.jpg',
-					};
+						uploadMemberAvatar(photoURL, user.user?.uid).then((snapshot) => {
+							snapshot?.ref.getDownloadURL().then(async (url) => {
+								await user.user?.updateProfile({
+									displayName: name,
+									photoURL: url,
+								});
 
-					dispatch(signUpAction(payload));
-					dispatch(setMember(payload));
+								const payload: Member = {
+									name: user.user?.displayName,
+									email: user.user?.email,
+									id: user.user?.uid,
+									photoUrl: user.user?.photoURL,
+								};
+
+								dispatch(signUpAction(payload));
+								dispatch(setMember(payload));
+							});
+						});
+					}
 				})
 				.catch((error) => dispatch(showAlert(error.message, ERROR)));
 
@@ -81,8 +96,8 @@ export const signIn = (
 						const payload = {
 							name: user.user?.displayName,
 							email: user.user?.email,
-							_id: user.user?.uid,
-							avatar: user.user?.photoURL,
+							id: user.user?.uid,
+							photoURL: user.user?.photoURL,
 						};
 
 						dispatch(signInAction(payload));
@@ -102,14 +117,11 @@ export const setMember = (
 ): ThunkAction<void, RootState, unknown, Action> => {
 	return async (dispatch) => {
 		try {
-			dispatch(showLoading());
 			await db.collection('users').doc(payload?.id).set(payload);
 
 			dispatch(setMemberAction(payload));
-			dispatch(hideLoading());
 		} catch (error) {
 			dispatch(showAlert(error.message, ERROR));
-			dispatch(hideLoading());
 		}
 	};
 };
@@ -174,4 +186,104 @@ export const fetchMembers = (): ThunkAction<
 			dispatch(hideLoading());
 		}
 	};
+};
+
+const uploadMemberAvatar = async (uri: string, name: string | undefined) => {
+	try {
+		const response = await fetch(uri);
+		const blob = await response.blob();
+		const ref = storage.ref().child(`membersAvatars/${name}`);
+
+		return ref.put(blob);
+	} catch (error) {
+		console.error(error.message);
+	}
+};
+
+const deleteMemberAvatar = async (name: string | undefined) => {
+	try {
+		await storage
+			.ref()
+			.child(`membersAvatars/${name}`)
+			.delete()
+			.then(() => {
+				console.log('avatar deleted - step 3');
+			});
+	} catch (error) {
+		console.error(error.message);
+	}
+};
+
+export const changePassword = (
+	pass: string
+): ThunkAction<void, RootState, unknown, Action> => {
+	return async (dispatch) => {
+		try {
+			dispatch(showLoading());
+
+			await auth.currentUser?.updatePassword(pass).then(() => {
+				dispatch(showAlert('Пароль успешно сменен', SUCCSSES));
+			});
+
+			dispatch(hideLoading());
+		} catch (error) {
+			dispatch(showAlert(error.message, ERROR));
+			dispatch(hideLoading());
+		}
+	};
+};
+
+export const updateProfile = (
+	displayName: string,
+	email: string,
+	photoUrl: string
+): ThunkAction<void, RootState, unknown, Action> => {
+	return async (dispatch) => {
+		try {
+			dispatch(showLoading());
+			const user = auth.currentUser;
+
+			await deleteMemberAvatar(user?.uid);
+			await uploadMemberAvatar(photoUrl, user?.uid).then((snapshot) => {
+				snapshot?.ref.getDownloadURL().then((url) => {
+					user
+						?.updateProfile({
+							displayName,
+							photoURL: url,
+						})
+						.then(() => {
+							user?.updateEmail(email).then(() => {
+								updateMember();
+							});
+						});
+				});
+			});
+		} catch (error) {
+			dispatch(showAlert(error.message, ERROR));
+			dispatch(hideLoading());
+		} finally {
+			dispatch(showAlert('Профиль успешно обновлен!', SUCCSSES));
+
+			dispatch(hideLoading());
+		}
+	};
+};
+
+const updateMember = async () => {
+	const member = auth.currentUser;
+
+	const payload: Member = {
+		name: member?.displayName,
+		email: member?.email,
+		photoUrl: member?.photoURL,
+		id: member?.uid,
+	};
+
+	await db
+		.collection('users')
+		.doc(member?.uid)
+		.update(payload)
+		.then(() => {
+			console.log('DB update succsses');
+		});
 };

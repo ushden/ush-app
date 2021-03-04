@@ -2,6 +2,7 @@ import firebase from 'firebase';
 
 import 'firebase/auth';
 import 'firebase/firestore';
+import 'firebase/storage';
 
 const config = {
 	apiKey: 'AIzaSyAubCU9j4t_PkXlI3aVbbqFM1h6erWpwgE',
@@ -16,7 +17,6 @@ if (firebase.apps.length === 0) {
 	firebase.initializeApp(config);
 }
 
-export const serverTime = firebase.firestore.FieldValue.serverTimestamp();
-
 export const auth = firebase.auth();
 export const db = firebase.firestore();
+export const storage = firebase.storage();

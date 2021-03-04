@@ -7,22 +7,13 @@ import {
 	Text,
 	View,
 	StatusBar as StatusBarNative,
-	FlatList,
-	TouchableOpacity,
 } from 'react-native';
-import { Button, List, Avatar, ActivityIndicator } from 'react-native-paper';
+import { Button } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchChats, fetchPrivateChats } from '../store/chats/chatsActions';
 import { RootState } from '../store/rootReducer';
-import { MaterialIcons } from '@expo/vector-icons';
 import { showAlert } from '../store/alert/alertActions';
-import {
-	PublicChat,
-	ERROR,
-	PrivateChat,
-	PRIVATE_CHATS,
-	PUBLIC_CHATS,
-} from '../store/types';
+import { PublicChat, ERROR, PRIVATE_CHATS, PUBLIC_CHATS } from '../store/types';
 import { db } from '../libs/firebase';
 import { PrivateChats } from '../components/PrivateChats';
 import { PublicChats } from '../components/PublicChats';

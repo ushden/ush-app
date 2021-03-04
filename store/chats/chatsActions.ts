@@ -4,7 +4,6 @@ import {
 	PRIVATE_CHATS,
 	PUBLIC_CHATS,
 	Message,
-	FETCH_PUBLIC_MESSAGE,
 	PublicChat,
 	ERROR,
 	FETCH_PUBLIC_CHATS,
@@ -24,10 +23,6 @@ const fetchChatsAction = (payload: Array<PublicChat>) => ({
 });
 const fetchPrivateChatsAction = (payload: Array<PrivateChat>) => ({
 	type: FETCH_PRIVATE_CHATS,
-	payload,
-});
-const fetchPublicMessagesAction = (payload: Message) => ({
-	type: FETCH_PUBLIC_MESSAGE,
 	payload,
 });
 
@@ -112,7 +107,6 @@ export const addChat = (
 				.set(payload)
 				.catch((e) => dispatch(showAlert(e.message, ERROR)));
 
-			// dispatch(addChatAction(payload));
 			dispatch(hideLoading());
 		} catch (error) {
 			dispatch(showAlert(error.message, ERROR));
@@ -134,7 +128,6 @@ export const createPrivateChat = (
 				.set(chatInfo)
 				.catch((e) => dispatch(showAlert(e.message, ERROR)));
 
-			// dispatch(createPrivateChatAction(chatInfo));
 			dispatch(hideLoading());
 		} catch (error) {
 			dispatch(showAlert(error.message, ERROR));
@@ -162,34 +155,6 @@ export const sendMessage = (
 			dispatch(hideLoading());
 		} catch (error) {
 			dispatch(showAlert(error.message, ERROR));
-			dispatch(hideLoading());
-		}
-	};
-};
-
-export const fetchPublicMessages = (
-	chatId: string
-): ThunkAction<void, RootState, unknown, Action> => {
-	return async (dispatch) => {
-		try {
-			dispatch(showLoading());
-			const payload: any = [];
-
-			await db
-				.collection(PUBLIC_CHATS)
-				.doc(chatId)
-				.collection(MESSAGES)
-				.get()
-				.then((querySnapshot) => {
-					querySnapshot.forEach((doc) => {
-						payload.push(doc.data());
-					});
-				});
-
-			dispatch(fetchPublicMessagesAction(payload));
-			dispatch(hideLoading());
-		} catch (error) {
-			dispatch(showAlert(error.messages, ERROR));
 			dispatch(hideLoading());
 		}
 	};

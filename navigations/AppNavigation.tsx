@@ -1,31 +1,65 @@
 import { createStackNavigator } from '@react-navigation/stack';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { AuthNavigation } from './AuthNavigation';
 import { MainNavigation } from './MainNavigation';
 import { useUser } from '../hooks/useUser';
-import { UpdateProfileScreen } from '../screens/UpdateProfileScreen';
-import { UserProfileScreen } from '../screens/MemberProfileScreen';
+import { ImagePicker } from 'expo';
+import { Platform } from 'react-native';
+import { showAlert } from '../store/alert/alertActions';
+import { ERROR } from '../store/types';
+import { useDispatch } from 'react-redux';
 
 const AppNavigationStack = createStackNavigator();
 
 export const AppNavigation = () => {
-	const user = useUser();
+	const member = useUser();
+	const dispatch = useDispatch();
+
+	useEffect(() => {
+		(async () => {
+			if (Platform.OS !== 'web') {
+				const {
+					status,
+				} = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+				if (status !== 'granted') {
+					dispatch(
+						showAlert('Дай доступ к фоткам, для аватарки, спасибо!', ERROR)
+					);
+				}
+			}
+		})();
+	}, []);
+
+	useEffect(() => {
+		(async () => {
+			if (Platform.OS !== 'web') {
+				const { status } = await ImagePicker.requestCameraPermissionsAsync();
+				if (status !== 'granted') {
+					dispatch(showAlert('Дай доступ к камере, спасибо!', ERROR));
+				}
+			}
+		})();
+	}, []);
+
+	useEffect(() => {
+		(async () => {
+			if (Platform.OS !== 'web') {
+				const { status } = await ImagePicker.requestCameraPermissionsAsync();
+				if (status !== 'granted') {
+					dispatch(showAlert('Дай доступ к камере, спасибо!', ERROR));
+				}
+			}
+		})();
+	}, []);
 
 	return (
 		<AppNavigationStack.Navigator headerMode='none'>
-			{user ? (
+			{member ? (
 				<AppNavigationStack.Screen name='Main' component={MainNavigation} />
 			) : (
 				<AppNavigationStack.Screen name='Auth' component={AuthNavigation} />
 			)}
-			<AppNavigationStack.Screen
-				name='UpdateProfile'
-				component={UpdateProfileScreen}
-			/>
-			<AppNavigationStack.Screen
-				name='UserProfileScreen'
-				component={UserProfileScreen}
-			/>
 		</AppNavigationStack.Navigator>
 	);
 };

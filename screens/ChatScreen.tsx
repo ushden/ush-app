@@ -20,7 +20,7 @@ import { db } from '../libs/firebase';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/rootReducer';
 import { sendMessage } from '../store/chats/chatsActions';
-import { ERROR, Message } from '../store/types';
+import { ERROR, Message, MESSAGES } from '../store/types';
 import { showAlert } from '../store/alert/alertActions';
 import { GiftedChat, IMessage, Send, User } from 'react-native-gifted-chat';
 import { ActivityIndicator } from 'react-native-paper';
@@ -59,7 +59,7 @@ export const ChatScreen = () => {
 		const unsubscribe = db
 			.collection(params._chatType)
 			.doc(params.chatId)
-			.collection('messages')
+			.collection(MESSAGES)
 			.orderBy('createdAt', 'desc')
 			.limit(20)
 			.onSnapshot(
@@ -74,7 +74,7 @@ export const ChatScreen = () => {
 						return {
 							_id: message.id,
 							text: message.content,
-							createdAt: Number(message.createdAt),
+							createdAt: +message.createdAt,
 							user: {
 								_id: message.member?.id,
 								name: message.member?.name,
@@ -101,7 +101,7 @@ export const ChatScreen = () => {
 				content: message.text,
 				chatId: params.chatId,
 				id: message._id,
-				createdAt: message.createdAt,
+				createdAt: Date.now().toString(),
 				member: {
 					name: member?.name,
 					id: member?.id,
@@ -120,7 +120,7 @@ export const ChatScreen = () => {
 		return (
 			<Send {...props}>
 				<View style={{ marginRight: 10, marginBottom: 10 }}>
-					<FontAwesome name='send-o' size={26} color='#aa4848' />
+					<FontAwesome name='send-o' size={24} color='#aa4848' />
 				</View>
 			</Send>
 		);
@@ -137,13 +137,12 @@ export const ChatScreen = () => {
 			</View>
 		);
 	};
-
 	return (
 		<SafeAreaView style={styles.container}>
 			<StatusBar style='light' />
 			<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
 				<KeyboardAvoidingView
-					keyboardVerticalOffset={80}
+					keyboardVerticalOffset={69}
 					behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
 					style={styles.container}>
 					<>
@@ -165,6 +164,7 @@ export const ChatScreen = () => {
 							)}
 							onPressAvatar={onPressAvatar}
 							renderSend={renderSend}
+							scrollToBottom={true}
 							scrollToBottomComponent={renderScrollToBottomComponet}
 						/>
 					</>
