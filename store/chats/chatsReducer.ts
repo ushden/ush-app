@@ -21,6 +21,7 @@ const initialState: Chats = {
 			chatId: '',
 			createMemberId: '',
 			_chatType: 'privateChats',
+			membersToken: [],
 			membersName: [],
 			membersPhotoUrl: [],
 			membersId: [],

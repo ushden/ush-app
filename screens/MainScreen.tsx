@@ -1,68 +1,73 @@
-import { useNavigation, useRoute } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
-import React, { useEffect, useCallback, useState } from 'react';
+import React, { useEffect } from 'react';
 import {
 	SafeAreaView,
 	StyleSheet,
-	Text,
 	ScrollView,
 	RefreshControl,
-	StatusBar as StatusBarNative,
-	View,
 } from 'react-native';
-import { ActivityIndicator, Button } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
-import { FontAwesome5 } from '@expo/vector-icons';
 
 import { RootState } from '../store/rootReducer';
-import { getMember, signOut } from '../store/members/membersActions';
+import { showAlert } from '../store/alert/alertActions';
+import { Post, POSTS, SUCCSSES, USERS } from '../store/types';
+import { getMember } from '../store/members/membersActions';
+import { PostItem } from '../components/PostItem';
+import { auth, db, registerForPushNotificationsAsync } from '../libs/firebase';
+import { FAB } from 'react-native-paper';
+import { useNavigation } from '@react-navigation/core';
+import { fetchPosts } from '../store/posts/postsActions';
 
 export const MainScreen = () => {
-	const navigation = useNavigation();
-	const { name, id, email }: any = useSelector(
-		(state: RootState) => state.members.member
-	);
+	const posts = useSelector((state: RootState) => state.posts.posts);
 	const loading = useSelector((state: RootState) => state.loading.loading);
 	const dispatch = useDispatch();
-	const route = useRoute();
+	const navigation = useNavigation();
 
 	useEffect(() => {
-		dispatch(getMember());
-	}, [route.name]);
+		const user = auth.currentUser;
 
-	useEffect(() => {
-		navigation.setOptions({
-			tabBarLabel: 'Главная',
-			tabBarIcon: ({ color }: any) => (
-				<FontAwesome5 name='home' size={22} color={color} />
-			),
-			tabBarColor: '#48aa48',
+		registerForPushNotificationsAsync().then((token) => {
+			db.collection(USERS)
+				.doc(user?.uid)
+				.update({
+					pushToken: token,
+				})
+				.then(() => {
+					dispatch(getMember());
+				});
 		});
-	}, [navigation]);
+	}, []);
+
+	useEffect(() => {
+		const unsubscribe = db.collection(POSTS).onSnapshot(() => {
+			dispatch(fetchPosts());
+		});
+		return () => unsubscribe();
+	}, []);
 
 	return (
 		<SafeAreaView style={styles.container}>
 			<StatusBar style='dark' />
 			<ScrollView
+				scrollToOverflowEnabled={true}
+				showsVerticalScrollIndicator={false}
 				refreshControl={
 					<RefreshControl
 						refreshing={loading}
-						onRefresh={() => dispatch(getMember())}
+						onRefresh={() => dispatch(showAlert('Перезагрузка', SUCCSSES))}
 					/>
 				}>
-				{loading ? (
-					<ActivityIndicator size='large' style={{ paddingTop: 200 }} />
-				) : (
-					<View>
-						<Text style={{ paddingTop: 200 }}>
-							Name: {name} Email: {email} ID: {id}
-						</Text>
-						<Button mode='contained' onPress={() => dispatch(signOut())}>
-							Out
-						</Button>
-					</View>
-				)}
+				{posts.map((post: Post) => (
+					<PostItem key={post?.postId} post={post} />
+				))}
 			</ScrollView>
+			<FAB
+				style={styles.fab}
+				icon='plus'
+				small={false}
+				onPress={() => navigation.navigate('CreatePostScreen')}
+			/>
 		</SafeAreaView>
 	);
 };
@@ -70,6 +75,13 @@ export const MainScreen = () => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		paddingTop: StatusBarNative.currentHeight,
+		paddingHorizontal: 5,
+	},
+	fab: {
+		position: 'absolute',
+		bottom: 0,
+		right: 0,
+		margin: 15,
+		zIndex: 999,
 	},
 });

@@ -207,7 +207,7 @@ const deleteMemberAvatar = async (name: string | undefined) => {
 			.child(`membersAvatars/${name}`)
 			.delete()
 			.then(() => {
-				console.log('avatar deleted - step 3');
+				console.log('avatar deleted');
 			});
 	} catch (error) {
 		console.error(error.message);

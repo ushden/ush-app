@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { AuthNavigation } from './AuthNavigation';
 import { MainNavigation } from './MainNavigation';
 import { useUser } from '../hooks/useUser';
-import { ImagePicker } from 'expo';
+import * as ImagePicker from 'expo-image-picker';
 import { Platform } from 'react-native';
 import { showAlert } from '../store/alert/alertActions';
 import { ERROR } from '../store/types';
@@ -26,17 +26,6 @@ export const AppNavigation = () => {
 					dispatch(
 						showAlert('Дай доступ к фоткам, для аватарки, спасибо!', ERROR)
 					);
-				}
-			}
-		})();
-	}, []);
-
-	useEffect(() => {
-		(async () => {
-			if (Platform.OS !== 'web') {
-				const { status } = await ImagePicker.requestCameraPermissionsAsync();
-				if (status !== 'granted') {
-					dispatch(showAlert('Дай доступ к камере, спасибо!', ERROR));
 				}
 			}
 		})();

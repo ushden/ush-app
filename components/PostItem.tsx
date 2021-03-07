@@ -1,38 +1,53 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Avatar, Card, IconButton, Paragraph, Title } from 'react-native-paper';
-import { useDispatch } from 'react-redux';
-import { showAlert } from '../store/alert/alertActions';
-import { DEFAULT_AVATAR_URL, Member, SUCCSSES } from '../store/types';
+import { useDispatch, useSelector } from 'react-redux';
+import { downloadImg } from '../store/posts/postsActions';
+import { RootState } from '../store/rootReducer';
+import { DEFAULT_AVATAR_URL, Post } from '../store/types';
 
-export const Post = ({ member }: { member: Member }) => {
-	const [like, setLike] = useState(false);
-	const [notLike, setNotLike] = useState(false);
+export const PostItem = ({ post }: { post: Post }) => {
+	const isLike = useSelector((state: RootState) => state.posts.post?.isLike);
+	const [shit, setShit] = useState(false);
 	const [save, setSave] = useState(false);
 	const dispatch = useDispatch();
 
 	const leftContent = (props: any) => (
 		<Avatar.Image
 			{...props}
-			source={{ uri: member?.photoUrl || DEFAULT_AVATAR_URL }}
+			source={{ uri: post?.author.photoUrl || DEFAULT_AVATAR_URL }}
 			style={{ margin: 0 }}
 		/>
 	);
+
+	const downloadImgHandler = () => {
+		dispatch(downloadImg(post?.imageUrl));
+	};
+
+	const savePost = () => {
+		setSave((save) => !save);
+	};
+
+	const pressLike = () => {};
+
+	const pressShit = () => {
+		setShit((shit) => !shit);
+	};
 
 	return (
 		<Card style={styles.card}>
 			<Card.Title
 				titleStyle={{ fontWeight: 'bold', fontSize: 13, textAlign: 'left' }}
 				subtitleStyle={{ color: 'gray', fontSize: 10 }}
-				title={member?.name}
-				subtitle={new Date().toDateString()}
+				title={post?.author.name}
+				subtitle={new Date(+post?.createAt).toLocaleDateString()}
 				left={leftContent}
 			/>
 			<Card.Content>
-				<Title>Заголовок</Title>
-				<Paragraph>Описание поста или хз что. Пусть будет пока</Paragraph>
+				<Title>{post?.title}</Title>
+				{post?.description ? <Paragraph>{post?.description}</Paragraph> : null}
 			</Card.Content>
-			<Card.Cover source={{ uri: 'https://picsum.photos/700' }} />
+			<Card.Cover source={{ uri: post?.imageUrl }} />
 			<Card.Actions style={{ justifyContent: 'space-around' }}>
 				<View
 					style={{
@@ -44,12 +59,12 @@ export const Post = ({ member }: { member: Member }) => {
 							alignItems: 'center',
 						}}>
 						<IconButton
-							icon={like ? 'heart' : 'heart-outline'}
+							icon={isLike ? 'heart' : 'heart-outline'}
 							animated={true}
 							color='red'
-							onPress={() => setLike((like) => !like)}
+							onPress={pressLike}
 						/>
-						<Text>0</Text>
+						<Text style={{ fontWeight: 'bold' }}>{post?.likes}</Text>
 					</View>
 					<View
 						style={{
@@ -58,12 +73,12 @@ export const Post = ({ member }: { member: Member }) => {
 							marginRight: 20,
 						}}>
 						<IconButton
-							icon={notLike ? 'emoticon-poop' : 'emoticon-poop-outline'}
+							icon={shit ? 'emoticon-poop' : 'emoticon-poop-outline'}
 							color='#90746D'
 							animated={true}
-							onPress={() => setNotLike((notLike) => !notLike)}
+							onPress={pressShit}
 						/>
-						<Text>0</Text>
+						<Text style={{ fontWeight: 'bold' }}>{post?.shits}</Text>
 					</View>
 				</View>
 				<View
@@ -80,7 +95,7 @@ export const Post = ({ member }: { member: Member }) => {
 							icon={save ? 'bookmark-check' : 'bookmark-outline'}
 							animated={true}
 							color='#7764ED'
-							onPress={() => setSave((save) => !save)}
+							onPress={savePost}
 						/>
 					</View>
 					<View
@@ -91,7 +106,7 @@ export const Post = ({ member }: { member: Member }) => {
 							icon='folder-download'
 							animated={true}
 							color='#ED7764'
-							onPress={() => dispatch(showAlert('Загрузка...', SUCCSSES))}
+							onPress={downloadImgHandler}
 						/>
 					</View>
 				</View>
@@ -105,6 +120,7 @@ const styles = StyleSheet.create({
 		width: '100%',
 		borderWidth: 0.3,
 		borderColor: 'lightgray',
-		marginBottom: 30,
+		marginBottom: 10,
+		marginTop: 10,
 	},
 });

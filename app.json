@@ -2,9 +2,13 @@
 	"expo": {
 		"name": "Club 48",
 		"slug": "Club_48",
-		"version": "1.0.1",
+		"version": "1.0.2",
 		"orientation": "portrait",
 		"icon": "./assets/icon.png",
+		"notification": {
+			"icon": "./assets/android-icon-96x96.png",
+			"color": "#000000"
+		},
 		"splash": {
 			"image": "./assets/splash.png",
 			"resizeMode": "contain",
@@ -18,6 +22,8 @@
 			"supportsTablet": true
 		},
 		"android": {
+			"googleServicesFile": "./google-services.json",
+			"useNextNotificationsApi": true,
 			"adaptiveIcon": {
 				"foregroundImage": "./assets/Club48.jpg",
 				"backgroundColor": "#FFFFFF"

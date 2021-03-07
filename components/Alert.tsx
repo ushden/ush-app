@@ -13,7 +13,7 @@ export const Alert = () => {
 	return (
 		<Snackbar
 			visible={displayAlert}
-			style={{ borderColor: type, shadowColor: type }}
+			style={{ backgroundColor: type }}
 			onDismiss={() => dispatch(hideAlert())}
 			action={{ label: 'Ok', onPress: () => dispatch(hideAlert()) }}>
 			{message}

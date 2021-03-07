@@ -3,17 +3,13 @@ import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import {
 	SafeAreaView,
-	View,
-	StatusBar as StatusBarNative,
 	RefreshControl,
 	ScrollView,
 	StyleSheet,
 } from 'react-native';
-import { Button } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { MemberInfo } from '../components/MemberInfo';
 import { MemberProfileHeader } from '../components/MemberProfileHeader';
-import { Post } from '../components/Post';
 import { createPrivateChat } from '../store/chats/chatsActions';
 import { getMember } from '../store/members/membersActions';
 import { RootState } from '../store/rootReducer';
@@ -34,6 +30,7 @@ export const MemberProfileScreen = () => {
 			_chatType: PRIVATE_CHATS,
 			chatId: `Chat_${Date.now().toString()}`,
 			createMemberId: member?.id,
+			membersToken: [member?.pushToken, params?.pushToken],
 			membersId: [member?.id, params?.id],
 			membersName: [member?.name, params?.name],
 			membersPhotoUrl: [member?.photoUrl, params?.photoUrl],
@@ -84,7 +81,7 @@ export const MemberProfileScreen = () => {
 				}}>
 				<MemberProfileHeader member={params} handlePress={handlePress} />
 				<MemberInfo />
-				<Post member={params} />
+				{/* <Post member={params} /> */}
 			</ScrollView>
 		</SafeAreaView>
 	);

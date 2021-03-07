@@ -16,7 +16,7 @@ import {
 	View,
 	Text,
 } from 'react-native';
-import { db } from '../libs/firebase';
+import { db, sendPushNotification } from '../libs/firebase';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/rootReducer';
 import { sendMessage } from '../store/chats/chatsActions';
@@ -29,13 +29,14 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export const ChatScreen = () => {
 	const { params }: any = useRoute();
+
 	const navigation = useNavigation();
 	const member = useSelector((state: RootState) => state.members.member);
 	const dispatch = useDispatch();
 
 	const [messages, setMessages] = useState([]);
 
-	const privateChatName = () => {
+	const getName = () => {
 		let name = '';
 
 		if (member?.id === params?.membersId[0]) {
@@ -49,9 +50,23 @@ export const ChatScreen = () => {
 		return name;
 	};
 
+	const getToken = () => {
+		let token = '';
+
+		if (member?.id === params?.membersId[0]) {
+			return (token = params?.membersToken[1]);
+		}
+
+		if (member?.id === params?.membersId[1]) {
+			return (token = params?.membersToken[0]);
+		}
+
+		return token;
+	};
+
 	useLayoutEffect(() => {
 		navigation.setOptions({
-			title: params?.chatName || privateChatName(),
+			title: params?.chatName || getName(),
 		});
 	}, []);
 
@@ -61,7 +76,7 @@ export const ChatScreen = () => {
 			.doc(params.chatId)
 			.collection(MESSAGES)
 			.orderBy('createdAt', 'desc')
-			.limit(20)
+			.limit(50)
 			.onSnapshot(
 				(querySnapshot) => {
 					const data: any = [];
@@ -110,7 +125,15 @@ export const ChatScreen = () => {
 				},
 			};
 
+			const pushData = {
+				name: member?.name,
+				message: message.text,
+			};
+
 			dispatch(sendMessage(payload, chatType));
+			sendPushNotification(getToken(), pushData).then(() => {
+				console.log(`Уведомление ушло ${getName()}. Push token ${getToken()}`);
+			});
 		});
 	}, []);
 

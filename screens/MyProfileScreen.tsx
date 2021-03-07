@@ -11,7 +11,6 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/rootReducer';
 import { getMember } from '../store/members/membersActions';
-import { Post } from '../components/Post';
 import { MemberInfo } from '../components/MemberInfo';
 import { ProfileHeader } from '../components/ProfileHeader';
 import { db } from '../libs/firebase';
@@ -55,7 +54,7 @@ export const ProfileScreen = () => {
 				}}>
 				<ProfileHeader member={member} />
 				<MemberInfo />
-				<Post member={member} />
+				{/* <Post member={member} /> */}
 			</ScrollView>
 		</SafeAreaView>
 	);

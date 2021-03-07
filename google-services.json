@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "665223787718",
+    "project_id": "ush-app",
+    "storage_bucket": "ush-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:665223787718:android:b14089a60d41cb2583d3c7",
+        "android_client_info": {
+          "package_name": "com.den48.ushapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "665223787718-moboj2jmrchaq028as0818untfbme6l9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAt9SIba0PcVCkqbFuD4QMMvNZ2MhB4aYI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "665223787718-moboj2jmrchaq028as0818untfbme6l9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

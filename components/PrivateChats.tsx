@@ -123,9 +123,10 @@ export const PrivateChats = () => {
 							<Avatar.Image
 								size={40}
 								source={{
-									uri: item?.membersPhotoUrl[0]
-										? item?.membersPhotoUrl[0]
-										: DEFAULT_AVATAR_URL,
+									uri:
+										item?.membersPhotoUrl[0] === id
+											? item?.membersPhotoUrl[0]
+											: item?.membersPhotoUrl[1],
 								}}
 							/>
 						)}

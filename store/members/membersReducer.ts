@@ -16,6 +16,7 @@ const initialState: MembersState = {
 		photoUrl: '',
 		id: '',
 		about: '',
+		pushToken: '',
 	},
 	members: [],
 };

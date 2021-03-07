@@ -13,16 +13,25 @@ export const FETCH_PUBLIC_CHATS = 'FETCH_PUBLIC_CHATS';
 export const FETCH_PRIVATE_CHATS = 'FETCH_PRIVATE_CHATS';
 export const SIGN_OUT = 'SIGN_OUT';
 export const FETCH_PUBLIC_MESSAGE = 'FETCH_PUBLIC_MESSAGE';
+export const CREATE_POST = 'CREATE_POST';
+export const FETCH_POSTS = 'FETCH_POSTS';
+export const ADD_LIKE = 'ADD_LIKE';
 
-export const ERROR = 'red';
-export const SUCCSSES = 'green';
+export const ERROR = 'darkred';
+export const SUCCSSES = '#48aa48';
 
 export const PRIVATE_CHATS = 'privateChats';
 export const PUBLIC_CHATS = 'publicChats';
 export const MESSAGES = 'messages';
+export const USERS = 'users';
+export const POSTS = 'posts';
 
 export const DEFAULT_AVATAR_URL =
 	'https://www.pinclipart.com/picdir/big/133-1331433_free-user-avatar-icons-happy-flat-design-png.png';
+export const LOGO =
+	'https://firebasestorage.googleapis.com/v0/b/ush-app.appspot.com/o/48_2.png?alt=media&token=139b0a20-58f8-45c8-90df-4df73627e698';
+export const POST_DOWNLOAD_IMG =
+	'https://firebasestorage.googleapis.com/v0/b/ush-app.appspot.com/o/upload_img%20(1).jpg?alt=media&token=cc38b8af-b190-4af9-9235-f487f8d65f60';
 export interface Message {
 	content: string;
 	id: string | number;
@@ -47,6 +56,7 @@ export interface PrivateChat {
 	chatId: string;
 	_chatType: string;
 	createMemberId: string;
+	membersToken: Array<string>;
 	membersName: Array<string>;
 	membersPhotoUrl: Array<string>;
 	membersId: Array<string>;
@@ -81,6 +91,7 @@ export type Member =
 			email: string | null | undefined;
 			photoUrl?: string | null | undefined;
 			about?: string | undefined | null;
+			pushToken?: string | undefined;
 	  }
 	| firebase.firestore.DocumentData
 	| undefined;
@@ -160,3 +171,38 @@ interface hideAlert {
 }
 
 export type AlertActions = showAlert | hideAlert;
+
+export type Post =
+	| {
+			title: string;
+			description?: string;
+			createAt: string | number;
+			imageUrl: string;
+			postId: string;
+			likes: number;
+			isLike: boolean;
+			shits: number;
+			whoLiked: string[];
+			author: Member;
+	  }
+	| firebase.firestore.DocumentData
+	| undefined;
+export interface PostsState {
+	post: Post;
+	posts: Array<Post>;
+}
+
+interface fetchPosts {
+	type: typeof FETCH_POSTS;
+	payload: Array<Post>;
+}
+interface createPost {
+	type: typeof CREATE_POST;
+	payload: Post;
+}
+
+interface addLike {
+	type: typeof ADD_LIKE;
+}
+
+export type PostsActions = createPost | fetchPosts;

@@ -108,9 +108,7 @@ export const MembersScreen = () => {
 										<Avatar.Image
 											size={40}
 											source={{
-												uri: item?.photoUrl
-													? item?.photoUrl
-													: DEFAULT_AVATAR_URL,
+												uri: item?.photoUrl || DEFAULT_AVATAR_URL,
 											}}
 										/>
 									)}
@@ -119,6 +117,7 @@ export const MembersScreen = () => {
 											name='keyboard-arrow-right'
 											size={24}
 											color='gray'
+											style={{ paddingTop: 12 }}
 										/>
 									)}
 								/>
