@@ -21,6 +21,10 @@ export const ProfileScreen = () => {
 	const member = useSelector((state: RootState) => state.members.member);
 
 	useEffect(() => {
+		dispatch(getMember());
+	}, []);
+
+	useEffect(() => {
 		const unsubscribe = db
 			.collection('users')
 			.doc(member?.id)
@@ -33,11 +37,10 @@ export const ProfileScreen = () => {
 
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
-			<StatusBar style='light' />
 			<View
 				style={{
 					paddingTop: StatusBarNative.currentHeight,
-					backgroundColor: '#6a2c70',
+					backgroundColor: '#df78ef',
 				}}></View>
 			<ScrollView
 				refreshControl={

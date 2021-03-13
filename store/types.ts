@@ -16,6 +16,11 @@ export const FETCH_PUBLIC_MESSAGE = 'FETCH_PUBLIC_MESSAGE';
 export const CREATE_POST = 'CREATE_POST';
 export const FETCH_POSTS = 'FETCH_POSTS';
 export const ADD_LIKE = 'ADD_LIKE';
+export const REMOVE_LIKE = 'REMOVE_LIKE';
+export const GET_LIKE = 'GET_LIKE';
+export const ADD_SHIT = 'ADD_SHIT';
+export const REMOVE_SHIT = 'REMOVE_SHIT';
+export const GET_SHIT = 'GET_SHIT';
 
 export const ERROR = 'darkred';
 export const SUCCSSES = '#48aa48';
@@ -25,6 +30,9 @@ export const PUBLIC_CHATS = 'publicChats';
 export const MESSAGES = 'messages';
 export const USERS = 'users';
 export const POSTS = 'posts';
+export const APPRAISAL = 'appraisal';
+export const LIKES = 'likes';
+export const SHITS = 'shits';
 
 export const DEFAULT_AVATAR_URL =
 	'https://www.pinclipart.com/picdir/big/133-1331433_free-user-avatar-icons-happy-flat-design-png.png';
@@ -180,9 +188,7 @@ export type Post =
 			imageUrl: string;
 			postId: string;
 			likes: number;
-			isLike: boolean;
 			shits: number;
-			whoLiked: string[];
 			author: Member;
 	  }
 	| firebase.firestore.DocumentData
@@ -205,4 +211,34 @@ interface addLike {
 	type: typeof ADD_LIKE;
 }
 
-export type PostsActions = createPost | fetchPosts;
+interface removeLike {
+	type: typeof REMOVE_LIKE;
+}
+
+interface getLike {
+	type: typeof GET_LIKE;
+	payload: number;
+}
+
+interface addShit {
+	type: typeof ADD_SHIT;
+}
+
+interface removeShit {
+	type: typeof REMOVE_SHIT;
+}
+
+interface getShit {
+	type: typeof GET_SHIT;
+	payload: number;
+}
+
+export type PostsActions =
+	| createPost
+	| fetchPosts
+	| addLike
+	| getLike
+	| removeLike
+	| addShit
+	| removeShit
+	| getShit;

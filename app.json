@@ -2,12 +2,12 @@
 	"expo": {
 		"name": "Club 48",
 		"slug": "Club_48",
-		"version": "1.0.2",
+		"version": "1.0.3",
 		"orientation": "portrait",
 		"icon": "./assets/icon.png",
 		"notification": {
 			"icon": "./assets/android-icon-96x96.png",
-			"color": "#000000"
+			"color": "#ffffff"
 		},
 		"splash": {
 			"image": "./assets/splash.png",

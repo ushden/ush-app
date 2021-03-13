@@ -1,5 +1,4 @@
 import { useNavigation } from '@react-navigation/native';
-import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import {
 	SafeAreaView,
@@ -17,6 +16,7 @@ import { PublicChat, ERROR, PRIVATE_CHATS, PUBLIC_CHATS } from '../store/types';
 import { db } from '../libs/firebase';
 import { PrivateChats } from '../components/PrivateChats';
 import { PublicChats } from '../components/PublicChats';
+import { useUser } from '../hooks/useUser';
 
 export const ChatsSrceen = () => {
 	const [loading, setLoading] = useState(true);
@@ -49,22 +49,26 @@ export const ChatsSrceen = () => {
 	}, []);
 
 	const handlePress = () => {
+		setLoading(true);
+
 		const isCreate = publicChats.some((chat: PublicChat) => chat.chatId === id);
 		if (isCreate) {
+			setLoading(false);
 			return dispatch(showAlert('Вы можете создать только один чат', ERROR));
 		} else {
+			setLoading(false);
 			navigation.navigate('CreateChatScreen');
 		}
 	};
 
 	return (
 		<SafeAreaView>
-			<StatusBar style='light' />
 			<View style={styles.statusBar}></View>
 			<View style={styles.createChat}>
 				<Button
 					mode='outlined'
 					icon='pen'
+					loading={loading}
 					color='#aa4848'
 					style={{ marginVertical: 10 }}
 					onPress={handlePress}>
@@ -88,7 +92,7 @@ export const ChatsSrceen = () => {
 const styles = StyleSheet.create({
 	statusBar: {
 		paddingTop: StatusBarNative.currentHeight,
-		backgroundColor: '#aa4848',
+		backgroundColor: '#ff867c',
 	},
 	createChat: {},
 	сhatsList: {

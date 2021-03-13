@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
 	KeyboardAvoidingView,
 	SafeAreaView,
@@ -16,6 +16,7 @@ import { signUp } from '../store/members/membersActions';
 import * as ImagePicker from 'expo-image-picker';
 import { showAlert } from '../store/alert/alertActions';
 import { DEFAULT_AVATAR_URL, ERROR } from '../store/types';
+import { getCameraPermissions, getMediaPermissions } from '../libs/firebase';
 
 export const SignUpScreen = () => {
 	const dispatch = useDispatch();
@@ -38,6 +39,12 @@ export const SignUpScreen = () => {
 	};
 
 	const openCamera = async () => {
+		const permission = await getCameraPermissions();
+
+		if (!permission) {
+			return;
+		}
+
 		setVisible(false);
 
 		let result = await ImagePicker.launchCameraAsync({
@@ -53,6 +60,11 @@ export const SignUpScreen = () => {
 	};
 
 	const openMediaLibrary = async () => {
+		const permission = await getMediaPermissions();
+
+		if (!permission) {
+			return;
+		}
 		setVisible(false);
 
 		let result = await ImagePicker.launchImageLibraryAsync({

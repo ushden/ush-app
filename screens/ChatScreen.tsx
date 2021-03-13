@@ -20,7 +20,7 @@ import { db, sendPushNotification } from '../libs/firebase';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/rootReducer';
 import { sendMessage } from '../store/chats/chatsActions';
-import { ERROR, Message, MESSAGES } from '../store/types';
+import { ERROR, Message, MESSAGES, PUBLIC_CHATS } from '../store/types';
 import { showAlert } from '../store/alert/alertActions';
 import { GiftedChat, IMessage, Send, User } from 'react-native-gifted-chat';
 import { ActivityIndicator } from 'react-native-paper';
@@ -66,7 +66,7 @@ export const ChatScreen = () => {
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
-			title: params?.chatName || getName(),
+			title: params?._chatType === PUBLIC_CHATS ? params?.chatName : getName(),
 		});
 	}, []);
 
@@ -131,9 +131,16 @@ export const ChatScreen = () => {
 			};
 
 			dispatch(sendMessage(payload, chatType));
-			sendPushNotification(getToken(), pushData).then(() => {
-				console.log(`Уведомление ушло ${getName()}. Push token ${getToken()}`);
-			});
+
+			if (params?._chatType === PUBLIC_CHATS) {
+				return;
+			} else {
+				sendPushNotification(getToken(), pushData).then(() => {
+					console.log(
+						`Уведомление ушло ${getName()}. Push token ${getToken()}`
+					);
+				});
+			}
 		});
 	}, []);
 

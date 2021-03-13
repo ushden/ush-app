@@ -9,7 +9,7 @@ import {
 	FETCH_PUBLIC_CHATS,
 	MESSAGES,
 } from './../types';
-import { auth, serverTime } from './../../libs/firebase';
+import { auth } from './../../libs/firebase';
 import { Action } from 'redux';
 import { ThunkAction } from 'redux-thunk';
 import { RootState } from '../rootReducer';
@@ -96,7 +96,7 @@ export const addChat = (
 				chatName,
 				_chatType: PUBLIC_CHATS,
 				chatId: member?.uid,
-				createTime: serverTime,
+				createTime: new Date().toISOString(),
 				chatAvatar:
 					'https://business.ucr.edu/sites/g/files/rcwecm2116/files/styles/form_preview/public/icon-group.png?itok=3LzNDSRI',
 			};

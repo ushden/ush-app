@@ -1,5 +1,6 @@
 import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
+import * as ImagePicker from 'expo-image-picker';
 import firebase from 'firebase';
 
 import 'firebase/auth';
@@ -23,6 +24,8 @@ if (firebase.apps.length === 0) {
 export const auth = firebase.auth();
 export const db = firebase.firestore();
 export const storage = firebase.storage();
+export const increment = firebase.firestore.FieldValue.increment(1);
+export const decrement = firebase.firestore.FieldValue.increment(-1);
 
 Notifications.setNotificationHandler({
 	handleNotification: async () => ({
@@ -59,32 +62,21 @@ export const sendPushNotification = async (
 	});
 };
 
+const getNotificationsPermission = async () => {
+	const { status } = await Notifications.getPermissionsAsync();
+
+	if (status !== 'granted') {
+		getNotificationsPermission();
+	}
+
+	return;
+};
+
 export const registerForPushNotificationsAsync = async () => {
 	let token;
 
 	if (Constants.isDevice) {
-		const {
-			status: existingStatus,
-		} = await Notifications.getPermissionsAsync();
-		let finalStatus = existingStatus;
-		if (existingStatus !== 'granted') {
-			const { status } = await Notifications.requestPermissionsAsync();
-			finalStatus = status;
-		}
-		if (finalStatus !== 'granted') {
-			Alert.alert('Разрешение', 'Нужен доступ к уведомлениям', [
-				{ text: 'OK', onPress: () => console.log('OK Pressed') },
-			]);
-			const { status } = await Notifications.requestPermissionsAsync();
-			finalStatus = status;
-		}
-
-		if (finalStatus !== 'granted') {
-			Alert.alert('Разрешение', 'Нужен доступ к уведомлениям', [
-				{ text: 'OK', onPress: () => console.log('OK Pressed') },
-			]);
-			return;
-		}
+		await getNotificationsPermission();
 
 		token = (await Notifications.getExpoPushTokenAsync()).data;
 		console.log(token);
@@ -104,4 +96,29 @@ export const registerForPushNotificationsAsync = async () => {
 	}
 
 	return token;
+};
+
+export const getMediaPermissions = async () => {
+	if (Platform.OS !== 'web') {
+		const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+		if (status !== 'granted') {
+			getMediaPermissions();
+			return;
+		}
+
+		return true;
+	}
+};
+
+export const getCameraPermissions = async () => {
+	if (Platform.OS !== 'web') {
+		const { status } = await ImagePicker.requestCameraPermissionsAsync();
+		if (status !== 'granted') {
+			getCameraPermissions();
+			return;
+		}
+
+		return true;
+	}
 };

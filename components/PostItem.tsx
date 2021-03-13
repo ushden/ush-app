@@ -1,16 +1,72 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Avatar, Card, IconButton, Paragraph, Title } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
-import { downloadImg } from '../store/posts/postsActions';
+import { db } from '../libs/firebase';
+import {
+	addLike,
+	addShit,
+	downloadImg,
+	getLike,
+	getShit,
+	removeLike,
+	removeShit,
+} from '../store/posts/postsActions';
 import { RootState } from '../store/rootReducer';
-import { DEFAULT_AVATAR_URL, Post } from '../store/types';
+import {
+	APPRAISAL,
+	DEFAULT_AVATAR_URL,
+	LIKES,
+	Post,
+	POSTS,
+	SHITS,
+} from '../store/types';
 
 export const PostItem = ({ post }: { post: Post }) => {
-	const isLike = useSelector((state: RootState) => state.posts.post?.isLike);
-	const [shit, setShit] = useState(false);
+	const [isShit, setIsShit] = useState(false);
+	const [isLike, setIsLike] = useState(false);
 	const [save, setSave] = useState(false);
+	const member = useSelector((state: RootState) => state.members.member);
 	const dispatch = useDispatch();
+
+	useEffect(() => {
+		const unsubscribe = db
+			.collection(POSTS)
+			.doc(post?.postId)
+			.onSnapshot(() => {
+				dispatch(getLike(post?.postId));
+				dispatch(getShit(post?.postId));
+			});
+		return () => unsubscribe();
+	}, []);
+
+	useEffect(() => {
+		db.collection(APPRAISAL)
+			.doc(post?.postId)
+			.collection(SHITS)
+			.doc(member?.id)
+			.get()
+			.then((doc) => {
+				if (doc.exists) {
+					const data = doc.data();
+					setIsShit(data?.isShit);
+				}
+			});
+	}, [post]);
+
+	useEffect(() => {
+		db.collection(APPRAISAL)
+			.doc(post?.postId)
+			.collection(LIKES)
+			.doc(member?.id)
+			.get()
+			.then((doc) => {
+				if (doc.exists) {
+					const data = doc.data();
+					setIsLike(data?.isLike);
+				}
+			});
+	}, [post]);
 
 	const leftContent = (props: any) => (
 		<Avatar.Image
@@ -28,10 +84,20 @@ export const PostItem = ({ post }: { post: Post }) => {
 		setSave((save) => !save);
 	};
 
-	const pressLike = () => {};
+	const pressLike = () => {
+		if (isLike) {
+			dispatch(removeLike(post?.postId));
+		} else {
+			dispatch(addLike(post?.postId));
+		}
+	};
 
 	const pressShit = () => {
-		setShit((shit) => !shit);
+		if (isShit) {
+			dispatch(removeShit(post?.postId));
+		} else {
+			dispatch(addShit(post?.postId));
+		}
 	};
 
 	return (
@@ -73,7 +139,7 @@ export const PostItem = ({ post }: { post: Post }) => {
 							marginRight: 20,
 						}}>
 						<IconButton
-							icon={shit ? 'emoticon-poop' : 'emoticon-poop-outline'}
+							icon={isShit ? 'emoticon-poop' : 'emoticon-poop-outline'}
 							color='#90746D'
 							animated={true}
 							onPress={pressShit}

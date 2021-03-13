@@ -3,7 +3,12 @@ import { hideLoading } from '../loading/loadingActions';
 import { showLoading } from '../loading/loadingActions';
 import { RootState } from '../rootReducer';
 import { showAlert } from '../alert/alertActions';
-import { auth, db, storage } from '../../libs/firebase';
+import {
+	auth,
+	db,
+	registerForPushNotificationsAsync,
+	storage,
+} from '../../libs/firebase';
 import { ThunkAction } from 'redux-thunk';
 import { Action } from 'redux';
 
@@ -59,15 +64,18 @@ export const signUp = (
 									photoURL: url,
 								});
 
-								const payload: Member = {
-									name: user.user?.displayName,
-									email: user.user?.email,
-									id: user.user?.uid,
-									photoUrl: user.user?.photoURL,
-								};
+								await registerForPushNotificationsAsync().then((token) => {
+									const payload: Member = {
+										name: user.user?.displayName,
+										email: user.user?.email,
+										id: user.user?.uid,
+										photoUrl: user.user?.photoURL,
+										pushToken: token,
+									};
 
-								dispatch(signUpAction(payload));
-								dispatch(setMember(payload));
+									dispatch(signUpAction(payload));
+									dispatch(setMember(payload));
+								});
 							});
 						});
 					}

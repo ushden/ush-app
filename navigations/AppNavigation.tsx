@@ -1,46 +1,13 @@
 import { createStackNavigator } from '@react-navigation/stack';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { AuthNavigation } from './AuthNavigation';
 import { MainNavigation } from './MainNavigation';
 import { useUser } from '../hooks/useUser';
-import * as ImagePicker from 'expo-image-picker';
-import { Platform } from 'react-native';
-import { showAlert } from '../store/alert/alertActions';
-import { ERROR } from '../store/types';
-import { useDispatch } from 'react-redux';
 
 const AppNavigationStack = createStackNavigator();
 
 export const AppNavigation = () => {
 	const member = useUser();
-	const dispatch = useDispatch();
-
-	useEffect(() => {
-		(async () => {
-			if (Platform.OS !== 'web') {
-				const {
-					status,
-				} = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-				if (status !== 'granted') {
-					dispatch(
-						showAlert('Дай доступ к фоткам, для аватарки, спасибо!', ERROR)
-					);
-				}
-			}
-		})();
-	}, []);
-
-	useEffect(() => {
-		(async () => {
-			if (Platform.OS !== 'web') {
-				const { status } = await ImagePicker.requestCameraPermissionsAsync();
-				if (status !== 'granted') {
-					dispatch(showAlert('Дай доступ к камере, спасибо!', ERROR));
-				}
-			}
-		})();
-	}, []);
 
 	return (
 		<AppNavigationStack.Navigator headerMode='none'>

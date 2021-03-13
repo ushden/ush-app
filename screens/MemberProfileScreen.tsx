@@ -1,6 +1,6 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
 	SafeAreaView,
 	RefreshControl,
@@ -22,42 +22,41 @@ export const MemberProfileScreen = () => {
 	const member = useSelector((state: RootState) => state.members.member);
 	const privateChats = useSelector(
 		(state: RootState) => state.chats.privateChats
-	);
+	).filter((chat) => chat.membersId.includes(member?.id));
+
 	const loading = useSelector((state: RootState) => state.loading.loading);
 
-	const handlePress = () => {
-		const chatInfo: PrivateChat = {
-			_chatType: PRIVATE_CHATS,
-			chatId: `Chat_${Date.now().toString()}`,
-			createMemberId: member?.id,
-			membersToken: [member?.pushToken, params?.pushToken],
-			membersId: [member?.id, params?.id],
-			membersName: [member?.name, params?.name],
-			membersPhotoUrl: [member?.photoUrl, params?.photoUrl],
-		};
+	useEffect(() => {
+		dispatch(getMember());
+	}, []);
 
-		let isNotCreate = true;
+	const handlePress = () => {
+		let createNew = true;
 
 		for (let i = 0; i < privateChats.length; i++) {
-			if (privateChats.length === 0) {
-				isNotCreate = !isNotCreate;
-
-				dispatch(createPrivateChat(chatInfo));
-				navigation.navigate('ChatSrceen', { ...chatInfo });
-				break;
-			}
-
-			if (
+			const isCreate =
 				privateChats[i].membersId.includes(member?.id) &&
-				privateChats[i].membersId.includes(params.id)
-			) {
-				isNotCreate = !isNotCreate;
+				privateChats[i].membersId.includes(params?.id);
+
+			if (isCreate) {
+				console.log(privateChats[i]);
+				createNew = !createNew;
 				navigation.navigate('ChatSrceen', { ...privateChats[i] });
-				break;
+				return;
 			}
 		}
 
-		if (isNotCreate) {
+		if (createNew) {
+			const chatInfo: PrivateChat = {
+				_chatType: PRIVATE_CHATS,
+				chatId: `Chat_${Date.now().toString()}`,
+				createMemberId: member?.id,
+				membersToken: [member?.pushToken, params?.pushToken],
+				membersId: [member?.id, params?.id],
+				membersName: [member?.name, params?.name],
+				membersPhotoUrl: [member?.photoUrl, params?.photoUrl],
+			};
+
 			dispatch(createPrivateChat(chatInfo));
 			navigation.navigate('ChatSrceen', { ...chatInfo });
 		}

@@ -10,13 +10,13 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { RootState } from '../store/rootReducer';
 import { showAlert } from '../store/alert/alertActions';
-import { Post, POSTS, SUCCSSES, USERS } from '../store/types';
-import { getMember } from '../store/members/membersActions';
+import { Post, POSTS, SUCCSSES } from '../store/types';
 import { PostItem } from '../components/PostItem';
-import { auth, db, registerForPushNotificationsAsync } from '../libs/firebase';
+import { db } from '../libs/firebase';
 import { FAB } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 import { fetchPosts } from '../store/posts/postsActions';
+import { getMember } from '../store/members/membersActions';
 
 export const MainScreen = () => {
 	const posts = useSelector((state: RootState) => state.posts.posts);
@@ -25,18 +25,8 @@ export const MainScreen = () => {
 	const navigation = useNavigation();
 
 	useEffect(() => {
-		const user = auth.currentUser;
-
-		registerForPushNotificationsAsync().then((token) => {
-			db.collection(USERS)
-				.doc(user?.uid)
-				.update({
-					pushToken: token,
-				})
-				.then(() => {
-					dispatch(getMember());
-				});
-		});
+		dispatch(fetchPosts());
+		dispatch(getMember());
 	}, []);
 
 	useEffect(() => {

@@ -56,11 +56,10 @@ export const MembersScreen = () => {
 
 	return (
 		<SafeAreaView>
-			<StatusBar style='light' />
 			<View
 				style={{
 					paddingTop: StatusBarNative.currentHeight,
-					backgroundColor: '#4848aa',
+					backgroundColor: '#80d6ff',
 				}}></View>
 			{loading ? (
 				<ActivityIndicator size='large' style={{ paddingTop: 200 }} />
@@ -68,6 +67,7 @@ export const MembersScreen = () => {
 				<FlatList
 					data={members.filter((member) => member?.name.includes(searchQuery))}
 					contentContainerStyle={{ justifyContent: 'center' }}
+					style={{ marginBottom: 20 }}
 					keyExtractor={(item) => item?.id}
 					ItemSeparatorComponent={renderSeparator}
 					ListEmptyComponent={
