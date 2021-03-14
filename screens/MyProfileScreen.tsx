@@ -14,11 +14,15 @@ import { getMember } from '../store/members/membersActions';
 import { MemberInfo } from '../components/MemberInfo';
 import { ProfileHeader } from '../components/ProfileHeader';
 import { db } from '../libs/firebase';
+import { PostItem } from '../components/PostItem';
 
 export const ProfileScreen = () => {
 	const dispatch = useDispatch();
 	const loading = useSelector((state: RootState) => state.loading.loading);
 	const member = useSelector((state: RootState) => state.members.member);
+	const posts = useSelector((state: RootState) => state.posts.posts).filter(
+		(post) => post?.author?.id === member?.id
+	);
 
 	useEffect(() => {
 		dispatch(getMember());
@@ -57,7 +61,11 @@ export const ProfileScreen = () => {
 				}}>
 				<ProfileHeader member={member} />
 				<MemberInfo />
-				{/* <Post member={member} /> */}
+				<View style={{ marginBottom: 20, width: '100%' }}>
+					{posts.map((post) => (
+						<PostItem post={post} key={post?.postId} />
+					))}
+				</View>
 			</ScrollView>
 		</SafeAreaView>
 	);

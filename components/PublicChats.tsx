@@ -23,10 +23,16 @@ const renderSeparator = () => {
 
 export const PublicChats = () => {
 	const navigation = useNavigation();
-	const loading = useSelector((state: RootState) => state.loading.loading);
+	const isLoaded = useSelector(
+		(state: RootState) => state.chats.isPublicChatsLoaded
+	);
 	const publicChats = useSelector(
 		(state: RootState) => state.chats.publicChats
 	);
+
+	if (!isLoaded) {
+		return <ActivityIndicator size='small' />;
+	}
 
 	if (publicChats.length === 0) {
 		return (
@@ -44,9 +50,7 @@ export const PublicChats = () => {
 		);
 	}
 
-	return loading ? (
-		<ActivityIndicator size='large' style={{ justifyContent: 'center' }} />
-	) : (
+	return (
 		<FlatList
 			data={publicChats}
 			ItemSeparatorComponent={renderSeparator}

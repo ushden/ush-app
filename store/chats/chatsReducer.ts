@@ -55,6 +55,8 @@ const initialState: Chats = {
 			},
 		},
 	],
+	isPrivateChatsLoaded: false,
+	isPublicChatsLoaded: false,
 };
 
 export const chatsReducer = (
@@ -63,11 +65,16 @@ export const chatsReducer = (
 ): Chats => {
 	switch (action.type) {
 		case FETCH_PUBLIC_CHATS:
-			return { ...state, publicChats: [...action.payload] };
+			return {
+				...state,
+				publicChats: [...action.payload],
+				isPublicChatsLoaded: true,
+			};
 		case FETCH_PRIVATE_CHATS:
 			return {
 				...state,
 				privateChats: [...action.payload],
+				isPrivateChatsLoaded: true,
 			};
 		case FETCH_PUBLIC_MESSAGE:
 			return { ...state };

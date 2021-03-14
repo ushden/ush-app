@@ -21,6 +21,7 @@ import { useNavigation } from '@react-navigation/core';
 
 export const CreatePostScreen = () => {
 	const [img, setImg] = useState('');
+	const [height, setHeight] = useState(0);
 	const [visible, setVisible] = useState(false);
 	const [name, setName] = useState('');
 	const [desc, setDesc] = useState('');
@@ -47,6 +48,7 @@ export const CreatePostScreen = () => {
 			shits: 0,
 			postId: `post-${Date.now()}`,
 			imageUrl: img,
+			imageHeight: height / 3.8,
 			author: {
 				name: member?.name,
 				email: member?.email,
@@ -68,7 +70,6 @@ export const CreatePostScreen = () => {
 		let result = await ImagePicker.launchCameraAsync({
 			mediaTypes: ImagePicker.MediaTypeOptions.Images,
 			allowsEditing: true,
-			aspect: [4, 3],
 			quality: 1,
 		});
 
@@ -83,12 +84,12 @@ export const CreatePostScreen = () => {
 		let result = await ImagePicker.launchImageLibraryAsync({
 			mediaTypes: ImagePicker.MediaTypeOptions.Images,
 			allowsEditing: true,
-			aspect: [4, 3],
 			quality: 1,
 		});
 
 		if (!result.cancelled) {
 			setImg(result.uri);
+			setHeight(result.height);
 		}
 	};
 
@@ -123,7 +124,16 @@ export const CreatePostScreen = () => {
 						<Card
 							onPress={() => setVisible(true)}
 							style={{ marginVertical: 10 }}>
-							<Card.Cover source={{ uri: img || POST_DOWNLOAD_IMG }} />
+							<Card.Cover
+								source={{ uri: img || POST_DOWNLOAD_IMG }}
+								resizeMode='center'
+								style={{
+									flex: 1,
+									width: '100%',
+									height: img ? height / 3.8 : 300,
+									resizeMode: 'center',
+								}}
+							/>
 						</Card>
 						<Button
 							mode='contained'

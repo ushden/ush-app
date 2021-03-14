@@ -52,9 +52,7 @@ export const PostItem = ({ post }: { post: Post }) => {
 					setIsShit(data?.isShit);
 				}
 			});
-	}, [post]);
 
-	useEffect(() => {
 		db.collection(APPRAISAL)
 			.doc(post?.postId)
 			.collection(LIKES)
@@ -88,6 +86,9 @@ export const PostItem = ({ post }: { post: Post }) => {
 		if (isLike) {
 			dispatch(removeLike(post?.postId));
 		} else {
+			if (isShit) {
+				dispatch(removeShit(post?.postId));
+			}
 			dispatch(addLike(post?.postId));
 		}
 	};
@@ -96,6 +97,9 @@ export const PostItem = ({ post }: { post: Post }) => {
 		if (isShit) {
 			dispatch(removeShit(post?.postId));
 		} else {
+			if (isLike) {
+				dispatch(removeLike(post?.postId));
+			}
 			dispatch(addShit(post?.postId));
 		}
 	};
@@ -113,7 +117,11 @@ export const PostItem = ({ post }: { post: Post }) => {
 				<Title>{post?.title}</Title>
 				{post?.description ? <Paragraph>{post?.description}</Paragraph> : null}
 			</Card.Content>
-			<Card.Cover source={{ uri: post?.imageUrl }} />
+			<Card.Cover
+				source={{ uri: post?.imageUrl }}
+				resizeMode='contain'
+				style={{ height: post?.imageHeight, width: '100%' }}
+			/>
 			<Card.Actions style={{ justifyContent: 'space-around' }}>
 				<View
 					style={{

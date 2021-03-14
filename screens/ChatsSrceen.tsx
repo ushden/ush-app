@@ -16,7 +16,6 @@ import { PublicChat, ERROR, PRIVATE_CHATS, PUBLIC_CHATS } from '../store/types';
 import { db } from '../libs/firebase';
 import { PrivateChats } from '../components/PrivateChats';
 import { PublicChats } from '../components/PublicChats';
-import { useUser } from '../hooks/useUser';
 
 export const ChatsSrceen = () => {
 	const [loading, setLoading] = useState(true);
@@ -24,6 +23,12 @@ export const ChatsSrceen = () => {
 	const dispatch = useDispatch();
 	const publicChats = useSelector(
 		(state: RootState) => state.chats.publicChats
+	);
+	const isPrivateChatsLoaded = useSelector(
+		(state: RootState) => state.chats.isPrivateChatsLoaded
+	);
+	const isPublicChatsLoaded = useSelector(
+		(state: RootState) => state.chats.isPublicChatsLoaded
 	);
 
 	const { id }: any = useSelector((state: RootState) => state.members.member);
@@ -75,16 +80,20 @@ export const ChatsSrceen = () => {
 					Создать чат
 				</Button>
 			</View>
-			{loading ? (
-				<ActivityIndicator size='large' style={{ paddingTop: 200 }} />
-			) : (
-				<View>
-					<Text style={styles.сhatsList}>Публичные чаты</Text>
+			<View>
+				<Text style={styles.сhatsList}>Публичные чаты</Text>
+				{isPublicChatsLoaded ? (
 					<PublicChats />
-					<Text style={styles.сhatsList}>Личные переписки</Text>
+				) : (
+					<ActivityIndicator size='small' style={{ paddingTop: 5 }} />
+				)}
+				<Text style={styles.сhatsList}>Личные переписки</Text>
+				{isPrivateChatsLoaded ? (
 					<PrivateChats />
-				</View>
-			)}
+				) : (
+					<ActivityIndicator size='small' style={{ paddingTop: 5 }} />
+				)}
+			</View>
 		</SafeAreaView>
 	);
 };

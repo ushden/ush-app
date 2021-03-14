@@ -15,8 +15,10 @@ import {
 	Platform,
 	View,
 	Text,
+	TouchableOpacity,
 } from 'react-native';
 import { db, sendPushNotification } from '../libs/firebase';
+import { AntDesign } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/rootReducer';
 import { sendMessage } from '../store/chats/chatsActions';
@@ -117,6 +119,7 @@ export const ChatScreen = () => {
 				chatId: params.chatId,
 				id: message._id,
 				createdAt: Date.now().toString(),
+
 				member: {
 					name: member?.name,
 					id: member?.id,
@@ -153,6 +156,18 @@ export const ChatScreen = () => {
 					<FontAwesome name='send-o' size={24} color='#aa4848' />
 				</View>
 			</Send>
+		);
+	};
+
+	const pressActionHandler = () => {};
+
+	const renderActions = () => {
+		return (
+			<View style={{ paddingLeft: 10, paddingBottom: 10 }}>
+				<TouchableOpacity activeOpacity={0.8} onPress={pressActionHandler}>
+					<AntDesign name='plussquareo' size={26} color='gray' />
+				</TouchableOpacity>
+			</View>
 		);
 	};
 
@@ -196,6 +211,11 @@ export const ChatScreen = () => {
 							renderSend={renderSend}
 							scrollToBottom={true}
 							scrollToBottomComponent={renderScrollToBottomComponet}
+							showAvatarForEveryMessage={true}
+							showUserAvatar={true}
+							renderUsernameOnMessage={true}
+							renderAvatarOnTop={true}
+							renderActions={renderActions}
 						/>
 					</>
 				</KeyboardAvoidingView>

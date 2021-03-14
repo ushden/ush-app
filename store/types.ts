@@ -75,6 +75,8 @@ export interface Chats {
 	privateChats: Array<PrivateChat>;
 	publicMessages: Array<Message>;
 	privateMessages: Array<Message>;
+	isPrivateChatsLoaded: boolean;
+	isPublicChatsLoaded: boolean;
 }
 
 interface fetchChatsAction {
@@ -186,6 +188,7 @@ export type Post =
 			description?: string;
 			createAt: string | number;
 			imageUrl: string;
+			imageHeight: number;
 			postId: string;
 			likes: number;
 			shits: number;
@@ -196,6 +199,7 @@ export type Post =
 export interface PostsState {
 	post: Post;
 	posts: Array<Post>;
+	isLoaded: boolean;
 }
 
 interface fetchPosts {

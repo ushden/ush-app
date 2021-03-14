@@ -17,6 +17,7 @@ const initialState: PostsState = {
 		description: '',
 		createAt: '',
 		imageUrl: '',
+		imageHeight: 0,
 		postId: '',
 		likes: 0,
 		shits: 0,
@@ -28,6 +29,7 @@ const initialState: PostsState = {
 		},
 	},
 	posts: [],
+	isLoaded: false,
 };
 
 export const postsReducer = (
@@ -38,7 +40,7 @@ export const postsReducer = (
 		case CREATE_POST:
 			return { ...state, post: { ...action.payload } };
 		case FETCH_POSTS:
-			return { ...state, posts: [...action.payload] };
+			return { ...state, posts: [...action.payload], isLoaded: true };
 		case ADD_LIKE:
 			return {
 				...state,

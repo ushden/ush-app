@@ -7,12 +7,7 @@ import { List, Avatar } from 'react-native-paper';
 import { useSelector } from 'react-redux';
 import { db } from '../libs/firebase';
 import { RootState } from '../store/rootReducer';
-import {
-	DEFAULT_AVATAR_URL,
-	MESSAGES,
-	PrivateChat,
-	PRIVATE_CHATS,
-} from '../store/types';
+import { MESSAGES, PrivateChat, PRIVATE_CHATS } from '../store/types';
 
 const renderSeparator = () => {
 	return (
@@ -31,11 +26,16 @@ export const PrivateChats = () => {
 	const navigation = useNavigation();
 
 	const { id }: any = useSelector((state: RootState) => state.members.member);
-	const loading = useSelector((state: RootState) => state.loading.loading);
-
+	const isLoaded = useSelector(
+		(state: RootState) => state.chats.isPrivateChatsLoaded
+	);
 	const privateChats = useSelector(
 		(state: RootState) => state.chats.privateChats
 	).filter((chat) => chat.membersId[0] === id || chat.membersId[1] === id);
+
+	if (!isLoaded) {
+		return <ActivityIndicator size='small' />;
+	}
 
 	if (privateChats.length === 0) {
 		return (
@@ -87,9 +87,7 @@ export const PrivateChats = () => {
 		);
 	};
 
-	return loading ? (
-		<ActivityIndicator size='large' style={{ justifyContent: 'center' }} />
-	) : (
+	return (
 		<FlatList
 			data={privateChats}
 			ItemSeparatorComponent={renderSeparator}
@@ -124,9 +122,9 @@ export const PrivateChats = () => {
 								size={40}
 								source={{
 									uri:
-										item?.membersPhotoUrl[0] === id
-											? item?.membersPhotoUrl[0]
-											: item?.membersPhotoUrl[1],
+										item?.membersId[0] === id
+											? item?.membersPhotoUrl[1]
+											: item?.membersPhotoUrl[0],
 								}}
 							/>
 						)}

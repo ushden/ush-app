@@ -39,7 +39,6 @@ export const MemberProfileScreen = () => {
 				privateChats[i].membersId.includes(params?.id);
 
 			if (isCreate) {
-				console.log(privateChats[i]);
 				createNew = !createNew;
 				navigation.navigate('ChatSrceen', { ...privateChats[i] });
 				return;

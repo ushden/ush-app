@@ -5,28 +5,29 @@ import {
 	StyleSheet,
 	ScrollView,
 	RefreshControl,
+	Text,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { RootState } from '../store/rootReducer';
-import { showAlert } from '../store/alert/alertActions';
-import { Post, POSTS, SUCCSSES } from '../store/types';
+import { Post, POSTS } from '../store/types';
 import { PostItem } from '../components/PostItem';
 import { db } from '../libs/firebase';
-import { FAB } from 'react-native-paper';
+import { ActivityIndicator, FAB } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 import { fetchPosts } from '../store/posts/postsActions';
 import { getMember } from '../store/members/membersActions';
 
 export const MainScreen = () => {
 	const posts = useSelector((state: RootState) => state.posts.posts);
+	const isLoaded = useSelector((state: RootState) => state.posts.isLoaded);
 	const loading = useSelector((state: RootState) => state.loading.loading);
 	const dispatch = useDispatch();
 	const navigation = useNavigation();
 
 	useEffect(() => {
-		dispatch(fetchPosts());
 		dispatch(getMember());
+		dispatch(fetchPosts());
 	}, []);
 
 	useEffect(() => {
@@ -35,6 +36,24 @@ export const MainScreen = () => {
 		});
 		return () => unsubscribe();
 	}, []);
+
+	if (!isLoaded) {
+		return <ActivityIndicator size='large' style={{ paddingTop: 200 }} />;
+	}
+
+	if (posts.length === 0) {
+		return (
+			<Text
+				style={{
+					textAlign: 'center',
+					fontWeight: '300',
+					fontSize: 14,
+					paddingTop: 200,
+				}}>
+				Создай первый пост на странице!
+			</Text>
+		);
+	}
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -45,7 +64,7 @@ export const MainScreen = () => {
 				refreshControl={
 					<RefreshControl
 						refreshing={loading}
-						onRefresh={() => dispatch(showAlert('Перезагрузка', SUCCSSES))}
+						onRefresh={() => dispatch(fetchPosts())}
 					/>
 				}>
 				{posts.map((post: Post) => (
