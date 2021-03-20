@@ -1,41 +1,39 @@
 {
-  "expo": {
-    "name": "Club 48",
-    "slug": "Club_48",
-    "version": "1.0.5",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "notification": {
-      "icon": "./assets/android-icon-96x96.png",
-      "color": "#ffffff"
-    },
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#000000"
-    },
-    "updates": {
-      "fallbackToCacheTimeout": 0
-    },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "googleServicesFile": "./google-services.json",
-      "useNextNotificationsApi": true,
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/Club48.png",
-        "backgroundColor": "#FFFFFF"
-      },
-      "package": "com.den48.ushapp"
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
-    "description": "Club 48 - welcome",
-    "githubUrl": "https://github.com/ushden/ush-app"
-  }
+	"expo": {
+		"name": "Club 48",
+		"slug": "Club_48",
+		"version": "1.1.48",
+		"orientation": "portrait",
+		"icon": "./assets/icon.png",
+		"notification": {
+			"icon": "./assets/android-icon-96x96.png",
+			"color": "#ffffff"
+		},
+		"splash": {
+			"image": "./assets/splash.png",
+			"resizeMode": "contain",
+			"backgroundColor": "#000000"
+		},
+		"updates": {
+			"fallbackToCacheTimeout": 0
+		},
+		"assetBundlePatterns": ["**/*"],
+		"ios": {
+			"supportsTablet": true
+		},
+		"android": {
+			"googleServicesFile": "./google-services.json",
+			"useNextNotificationsApi": true,
+			"adaptiveIcon": {
+				"foregroundImage": "./assets/Club48.png",
+				"backgroundColor": "#FFFFFF"
+			},
+			"package": "com.den48.ushapp"
+		},
+		"web": {
+			"favicon": "./assets/favicon.png"
+		},
+		"description": "Club 48 - welcome",
+		"githubUrl": "https://github.com/ushden/ush-app"
+	}
 }
