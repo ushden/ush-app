@@ -41,10 +41,11 @@ export const LOGO =
 export const POST_DOWNLOAD_IMG =
 	'https://firebasestorage.googleapis.com/v0/b/ush-app.appspot.com/o/upload_img%20(1).jpg?alt=media&token=cc38b8af-b190-4af9-9235-f487f8d65f60';
 export interface Message {
-	content: string;
+	content?: string;
 	id: string | number;
 	chatId: string;
 	createdAt: string | Date;
+	image?: string | null;
 	member: Member;
 }
 interface updatePublicMessageAction {
@@ -189,6 +190,7 @@ export type Post =
 			createAt: string | number;
 			imageUrl: string;
 			imageHeight: number;
+			imageWidth: number;
 			postId: string;
 			likes: number;
 			shits: number;

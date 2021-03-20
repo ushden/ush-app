@@ -8,6 +8,7 @@ import {
 	StyleSheet,
 	Text,
 	View,
+	Dimensions,
 } from 'react-native';
 import { Card, Portal, TextInput, Modal, Button } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -22,6 +23,7 @@ import { useNavigation } from '@react-navigation/core';
 export const CreatePostScreen = () => {
 	const [img, setImg] = useState('');
 	const [height, setHeight] = useState(0);
+	const [width, setWidth] = useState(0);
 	const [visible, setVisible] = useState(false);
 	const [name, setName] = useState('');
 	const [desc, setDesc] = useState('');
@@ -30,6 +32,10 @@ export const CreatePostScreen = () => {
 
 	const loading = useSelector((state: RootState) => state.loading.loading);
 	const member = useSelector((state: RootState) => state.members.member);
+
+	const window = Dimensions.get('window');
+	let imageHeight = img ? Math.floor((window.width / width) * height) : 300;
+	let imageWidth = Math.floor(window.width);
 
 	const createPostHandle = () => {
 		if (img === '') {
@@ -48,7 +54,8 @@ export const CreatePostScreen = () => {
 			shits: 0,
 			postId: `post-${Date.now()}`,
 			imageUrl: img,
-			imageHeight: height / 3.8,
+			imageHeight: imageHeight,
+			imageWidth: imageWidth,
 			author: {
 				name: member?.name,
 				email: member?.email,
@@ -74,6 +81,8 @@ export const CreatePostScreen = () => {
 		});
 
 		if (!result.cancelled) {
+			setHeight(result.height);
+			setWidth(result.width);
 			setImg(result.uri);
 		}
 	};
@@ -88,8 +97,9 @@ export const CreatePostScreen = () => {
 		});
 
 		if (!result.cancelled) {
-			setImg(result.uri);
 			setHeight(result.height);
+			setWidth(result.width);
+			setImg(result.uri);
 		}
 	};
 
@@ -126,12 +136,13 @@ export const CreatePostScreen = () => {
 							style={{ marginVertical: 10 }}>
 							<Card.Cover
 								source={{ uri: img || POST_DOWNLOAD_IMG }}
-								resizeMode='center'
+								resizeMode='contain'
 								style={{
 									flex: 1,
-									width: '100%',
-									height: img ? height / 3.8 : 300,
-									resizeMode: 'center',
+									alignSelf: 'stretch',
+									maxWidth: '100%',
+									width: imageWidth,
+									height: imageHeight,
 								}}
 							/>
 						</Card>

@@ -6,6 +6,7 @@ import {
 	ScrollView,
 	RefreshControl,
 	Text,
+	View,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -41,20 +42,6 @@ export const MainScreen = () => {
 		return <ActivityIndicator size='large' style={{ paddingTop: 200 }} />;
 	}
 
-	if (posts.length === 0) {
-		return (
-			<Text
-				style={{
-					textAlign: 'center',
-					fontWeight: '300',
-					fontSize: 14,
-					paddingTop: 200,
-				}}>
-				Создай первый пост на странице!
-			</Text>
-		);
-	}
-
 	return (
 		<SafeAreaView style={styles.container}>
 			<StatusBar style='dark' />
@@ -67,9 +54,23 @@ export const MainScreen = () => {
 						onRefresh={() => dispatch(fetchPosts())}
 					/>
 				}>
-				{posts.map((post: Post) => (
-					<PostItem key={post?.postId} post={post} />
-				))}
+				{posts.length === 0 ? (
+					<Text
+						style={{
+							textAlign: 'center',
+							fontWeight: '300',
+							fontSize: 14,
+							paddingTop: 200,
+						}}>
+						Создай первый пост на странице!
+					</Text>
+				) : (
+					<View>
+						{posts.map((post: Post) => (
+							<PostItem key={post?.postId} post={post} />
+						))}
+					</View>
+				)}
 			</ScrollView>
 			<FAB
 				style={styles.fab}

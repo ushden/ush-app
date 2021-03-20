@@ -29,12 +29,6 @@ export const SignUpScreen = () => {
 	const [visible, setVisible] = useState(false);
 
 	const pressHandler = () => {
-		if (imgRef === '') {
-			return dispatch(showAlert('Выбери аватар, это важно!', ERROR));
-		}
-		if (password.length < 6) {
-			return dispatch(showAlert('Напиши больше 6 символов', ERROR));
-		}
 		dispatch(signUp(name.trim(), email.trim(), password.trim(), imgRef));
 	};
 

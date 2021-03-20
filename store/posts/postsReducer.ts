@@ -18,6 +18,7 @@ const initialState: PostsState = {
 		createAt: '',
 		imageUrl: '',
 		imageHeight: 0,
+		imageWidth: 0,
 		postId: '',
 		likes: 0,
 		shits: 0,

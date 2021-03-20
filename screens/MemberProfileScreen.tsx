@@ -6,10 +6,13 @@ import {
 	RefreshControl,
 	ScrollView,
 	StyleSheet,
+	View,
+	Text,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { MemberInfo } from '../components/MemberInfo';
 import { MemberProfileHeader } from '../components/MemberProfileHeader';
+import { PostItem } from '../components/PostItem';
 import { createPrivateChat } from '../store/chats/chatsActions';
 import { getMember } from '../store/members/membersActions';
 import { RootState } from '../store/rootReducer';
@@ -23,6 +26,9 @@ export const MemberProfileScreen = () => {
 	const privateChats = useSelector(
 		(state: RootState) => state.chats.privateChats
 	).filter((chat) => chat.membersId.includes(member?.id));
+	const posts = useSelector((state: RootState) => state.posts.posts).filter(
+		(post) => params?.id === post?.author?.id
+	);
 
 	const loading = useSelector((state: RootState) => state.loading.loading);
 
@@ -79,7 +85,20 @@ export const MemberProfileScreen = () => {
 				}}>
 				<MemberProfileHeader member={params} handlePress={handlePress} />
 				<MemberInfo />
-				{/* <Post member={params} /> */}
+				{posts.length === 0 ? (
+					<View>
+						<Text
+							style={{ textAlign: 'center', paddingTop: 20, color: 'gray' }}>
+							У члена еще нету постов
+						</Text>
+					</View>
+				) : (
+					<View>
+						{posts.map((post) => (
+							<PostItem post={post} key={post?.postId} />
+						))}
+					</View>
+				)}
 			</ScrollView>
 		</SafeAreaView>
 	);

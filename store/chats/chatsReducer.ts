@@ -32,6 +32,7 @@ const initialState: Chats = {
 			content: '',
 			id: '',
 			chatId: '',
+			image: '',
 			createdAt: '',
 			member: {
 				name: '',
@@ -47,6 +48,7 @@ const initialState: Chats = {
 			id: '',
 			chatId: '',
 			createdAt: '',
+			image: '',
 			member: {
 				name: '',
 				id: '',

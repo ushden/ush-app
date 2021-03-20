@@ -9,7 +9,7 @@ import {
 	FETCH_PUBLIC_CHATS,
 	MESSAGES,
 } from './../types';
-import { auth } from './../../libs/firebase';
+import { auth, storage } from './../../libs/firebase';
 import { Action } from 'redux';
 import { ThunkAction } from 'redux-thunk';
 import { RootState } from '../rootReducer';
@@ -127,6 +127,43 @@ export const createPrivateChat = (
 				.doc(chatInfo.chatId)
 				.set(chatInfo)
 				.catch((e) => dispatch(showAlert(e.message, ERROR)));
+
+			dispatch(hideLoading());
+		} catch (error) {
+			dispatch(showAlert(error.message, ERROR));
+			dispatch(hideLoading());
+		}
+	};
+};
+
+const uploadImage = async (uri: any, chatId: string) => {
+	try {
+		const response = await fetch(uri);
+		const blob = await response.blob();
+		const ref = storage.ref().child(`chatImage/${chatId}/${Date.now()}`);
+
+		return ref.put(blob);
+	} catch (error) {
+		console.error(error.message);
+	}
+};
+
+export const sendImage = (
+	message: Message,
+	chatType: string
+): ThunkAction<void, RootState, unknown, Action> => {
+	return async (dispatch) => {
+		try {
+			dispatch(showLoading());
+
+			const snapshot = await uploadImage(message.image, message.chatId);
+			const url = await snapshot?.ref.getDownloadURL();
+
+			await db
+				.collection(chatType)
+				.doc(message.chatId)
+				.collection(MESSAGES)
+				.add({ ...message, image: url });
 
 			dispatch(hideLoading());
 		} catch (error) {

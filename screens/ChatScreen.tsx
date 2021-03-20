@@ -1,5 +1,6 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
+import * as ImagePicker from 'expo-image-picker';
 import React, {
 	useEffect,
 	useLayoutEffect,
@@ -16,16 +17,29 @@ import {
 	View,
 	Text,
 	TouchableOpacity,
+	Image,
 } from 'react-native';
 import { db, sendPushNotification } from '../libs/firebase';
 import { AntDesign } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/rootReducer';
-import { sendMessage } from '../store/chats/chatsActions';
-import { ERROR, Message, MESSAGES, PUBLIC_CHATS } from '../store/types';
+import { sendImage, sendMessage } from '../store/chats/chatsActions';
+import {
+	ERROR,
+	Message,
+	MESSAGES,
+	PUBLIC_CHATS,
+	SUCCSSES,
+} from '../store/types';
 import { showAlert } from '../store/alert/alertActions';
-import { GiftedChat, IMessage, Send, User } from 'react-native-gifted-chat';
-import { ActivityIndicator } from 'react-native-paper';
+import {
+	Bubble,
+	GiftedChat,
+	IMessage,
+	Send,
+	User,
+} from 'react-native-gifted-chat';
+import { ActivityIndicator, Button, Modal, Portal } from 'react-native-paper';
 import { FontAwesome } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -37,6 +51,8 @@ export const ChatScreen = () => {
 	const dispatch = useDispatch();
 
 	const [messages, setMessages] = useState([]);
+	const [img, setImg] = useState('');
+	const [visible, setVisible] = useState(false);
 
 	const getName = () => {
 		let name = '';
@@ -71,6 +87,13 @@ export const ChatScreen = () => {
 			title: params?._chatType === PUBLIC_CHATS ? params?.chatName : getName(),
 		});
 	}, []);
+	console.log(img);
+
+	// useEffect(() => {
+	// 	if (img) {
+	// 		onSendImage();
+	// 	}
+	// }, [img]);
 
 	useEffect(() => {
 		const unsubscribe = db
@@ -90,8 +113,9 @@ export const ChatScreen = () => {
 					let messages = data.map((message: Message) => {
 						return {
 							_id: message.id,
-							text: message.content,
+							text: message.content || ' ',
 							createdAt: +message.createdAt,
+							image: message.image || null,
 							user: {
 								_id: message.member?.id,
 								name: message.member?.name,
@@ -108,6 +132,37 @@ export const ChatScreen = () => {
 		return () => unsubscribe();
 	}, []);
 
+	const onSendImage = () => {
+		const chatType: string = params?._chatType;
+		const payload: Message = {
+			chatId: params.chatId,
+			id: `Image_${Date.now()}`,
+			createdAt: Date.now().toString(),
+			image: img,
+			member: {
+				name: member?.name,
+				id: member?.id,
+				photoUrl: member?.photoUrl,
+				email: member?.email,
+			},
+		};
+		const pushData = {
+			name: member?.name,
+			message: 'Изображение',
+		};
+
+		dispatch(sendImage(payload, chatType));
+		setImg('');
+
+		if (params?._chatType === PUBLIC_CHATS) {
+			return;
+		} else {
+			sendPushNotification(getToken(), pushData).then(() => {
+				console.log(`Уведомление ушло ${getName()}. Push token ${getToken()}`);
+			});
+		}
+	};
+
 	const onSend = useCallback((messages = []) => {
 		setMessages((previousMessages) =>
 			GiftedChat.append(previousMessages, messages)
@@ -119,7 +174,6 @@ export const ChatScreen = () => {
 				chatId: params.chatId,
 				id: message._id,
 				createdAt: Date.now().toString(),
-
 				member: {
 					name: member?.name,
 					id: member?.id,
@@ -147,7 +201,7 @@ export const ChatScreen = () => {
 		});
 	}, []);
 
-	const onPressAvatar = (user: User) => {};
+	const onPressAvatar = (user: User) => dispatch(showAlert('KEK', SUCCSSES));
 
 	const renderSend = (props: any) => {
 		return (
@@ -159,12 +213,38 @@ export const ChatScreen = () => {
 		);
 	};
 
-	const pressActionHandler = () => {};
+	const openCamera = async () => {
+		setVisible(false);
+
+		let result = await ImagePicker.launchCameraAsync({
+			mediaTypes: ImagePicker.MediaTypeOptions.Images,
+			allowsEditing: true,
+			quality: 1,
+		});
+
+		if (!result.cancelled) {
+			setImg(result.uri);
+		}
+	};
+
+	const openMediaLibrary = async () => {
+		setVisible(false);
+
+		let result = await ImagePicker.launchImageLibraryAsync({
+			mediaTypes: ImagePicker.MediaTypeOptions.Images,
+			allowsEditing: true,
+			quality: 1,
+		});
+
+		if (!result.cancelled) {
+			setImg(result.uri);
+		}
+	};
 
 	const renderActions = () => {
 		return (
 			<View style={{ paddingLeft: 10, paddingBottom: 10 }}>
-				<TouchableOpacity activeOpacity={0.8} onPress={pressActionHandler}>
+				<TouchableOpacity activeOpacity={0.8} onPress={() => setVisible(true)}>
 					<AntDesign name='plussquareo' size={26} color='gray' />
 				</TouchableOpacity>
 			</View>
@@ -182,6 +262,19 @@ export const ChatScreen = () => {
 			</View>
 		);
 	};
+
+	const renderBubble = (props: Bubble['props']) => {
+		return (
+			<Bubble
+				{...props}
+				wrapperStyle={{
+					left: { backgroundColor: 'white' },
+					right: { backgroundColor: '#aa4848' },
+				}}
+			/>
+		);
+	};
+
 	return (
 		<SafeAreaView style={styles.container}>
 			<StatusBar style='light' />
@@ -190,36 +283,66 @@ export const ChatScreen = () => {
 					keyboardVerticalOffset={69}
 					behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
 					style={styles.container}>
-					<>
-						<GiftedChat
-							messages={messages}
-							onSend={(messages) => onSend(messages)}
-							user={{
-								_id: member?.id,
-								name: member?.name,
-								avatar: member?.photoUrl,
-							}}
-							placeholder='Сообщение'
-							// isTyping={true}
-							// loadEarlier={true}
-							isLoadingEarlier={true}
-							infiniteScroll={true}
-							renderLoading={() => (
-								<ActivityIndicator size='large' style={{ paddingTop: 100 }} />
-							)}
-							onPressAvatar={onPressAvatar}
-							renderSend={renderSend}
-							scrollToBottom={true}
-							scrollToBottomComponent={renderScrollToBottomComponet}
-							showAvatarForEveryMessage={true}
-							showUserAvatar={true}
-							renderUsernameOnMessage={true}
-							renderAvatarOnTop={true}
-							renderActions={renderActions}
-						/>
-					</>
+					{/* <> */}
+					<GiftedChat
+						messages={messages}
+						onSend={(messages) => onSend(messages)}
+						user={{
+							_id: member?.id,
+							name: member?.name,
+							avatar: member?.photoUrl,
+						}}
+						placeholder='Сообщение'
+						// isTyping={true}
+						// loadEarlier={true}
+						isLoadingEarlier={true}
+						infiniteScroll={true}
+						renderBubble={renderBubble}
+						renderLoading={() => (
+							<ActivityIndicator size='large' style={{ paddingTop: 100 }} />
+						)}
+						onPressAvatar={onPressAvatar}
+						renderSend={renderSend}
+						scrollToBottom={true}
+						scrollToBottomComponent={renderScrollToBottomComponet}
+						showUserAvatar={true}
+						renderUsernameOnMessage={true}
+						renderAvatarOnTop={true}
+						renderActions={renderActions}
+					/>
+					{/* </> */}
 				</KeyboardAvoidingView>
 			</TouchableWithoutFeedback>
+			<Portal>
+				<Modal
+					visible={visible}
+					dismissable={true}
+					onDismiss={() => setVisible(false)}>
+					<View
+						style={{
+							backgroundColor: '#fff',
+							padding: 20,
+							paddingHorizontal: 40,
+						}}>
+						<Button
+							style={{ marginVertical: 10 }}
+							mode='outlined'
+							icon='image'
+							onPress={openMediaLibrary}
+							labelStyle={{ color: '#aa4848' }}>
+							Выбрать фото
+						</Button>
+						<Button
+							style={{ marginVertical: 10 }}
+							mode='outlined'
+							icon='camera'
+							onPress={openCamera}
+							labelStyle={{ color: '#48aa48' }}>
+							Сделать фото
+						</Button>
+					</View>
+				</Modal>
+			</Portal>
 		</SafeAreaView>
 	);
 };

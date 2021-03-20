@@ -12,11 +12,10 @@ import { fetchMembers } from '../store/members/membersActions';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/rootReducer';
 import { FlatList } from 'react-native-gesture-handler';
-import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, Avatar, List, Searchbar } from 'react-native-paper';
 import { MaterialIcons } from '@expo/vector-icons';
 import { db } from '../libs/firebase';
-import { DEFAULT_AVATAR_URL, Member } from '../store/types';
+import { DEFAULT_AVATAR_URL } from '../store/types';
 
 const renderSeparator = () => {
 	return (

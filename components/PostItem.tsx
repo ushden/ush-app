@@ -120,7 +120,11 @@ export const PostItem = ({ post }: { post: Post }) => {
 			<Card.Cover
 				source={{ uri: post?.imageUrl }}
 				resizeMode='contain'
-				style={{ height: post?.imageHeight, width: '100%' }}
+				style={{
+					height: post?.imageHeight,
+					width: post?.imageWidth,
+					maxWidth: '100%',
+				}}
 			/>
 			<Card.Actions style={{ justifyContent: 'space-around' }}>
 				<View

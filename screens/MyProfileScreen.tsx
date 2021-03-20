@@ -7,6 +7,7 @@ import {
 	StatusBar as StatusBarNative,
 	StyleSheet,
 	View,
+	Text,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/rootReducer';
@@ -61,11 +62,20 @@ export const ProfileScreen = () => {
 				}}>
 				<ProfileHeader member={member} />
 				<MemberInfo />
-				<View style={{ marginBottom: 20, width: '100%' }}>
-					{posts.map((post) => (
-						<PostItem post={post} key={post?.postId} />
-					))}
-				</View>
+				{posts.length === 0 ? (
+					<View>
+						<Text
+							style={{ textAlign: 'center', paddingTop: 20, color: 'gray' }}>
+							Вы еще не созади пост
+						</Text>
+					</View>
+				) : (
+					<View style={{ marginBottom: 20, width: '100%' }}>
+						{posts.map((post) => (
+							<PostItem post={post} key={post?.postId} />
+						))}
+					</View>
+				)}
 			</ScrollView>
 		</SafeAreaView>
 	);

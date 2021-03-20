@@ -1,4 +1,4 @@
-import { SIGN_OUT, SUCCSSES } from './../types';
+import { SIGN_OUT, SUCCSSES, USERS } from './../types';
 import { hideLoading } from '../loading/loadingActions';
 import { showLoading } from '../loading/loadingActions';
 import { RootState } from '../rootReducer';
@@ -288,7 +288,7 @@ const updateMember = async () => {
 	};
 
 	await db
-		.collection('users')
+		.collection(USERS)
 		.doc(member?.uid)
 		.update(payload)
 		.then(() => {
