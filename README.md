@@ -4,7 +4,7 @@
 
 # Some screenshots
 
-<a href="https://ibb.co/tXc9fyW"><img src="https://i.ibb.co/vYmS52K/Screenshot-20210927-180519.jpg" alt="Screenshot-20210927-180519" border="0" width="450"></a>
-<a href="https://ibb.co/3ztQtLb"><img src="https://i.ibb.co/TLzdzFG/Screenshot-20210927-180513.jpg" alt="Screenshot-20210927-180513" border="0"></a>
-<a href="https://ibb.co/bFGYT3D"><img src="https://i.ibb.co/nBK490t/Screenshot-20210927-180433.jpg" alt="Screenshot-20210927-180433" border="0"></a>
-<a href="https://ibb.co/bWHx2GC"><img src="https://i.ibb.co/p0WgRkM/Screenshot-20210927-180224.jpg" alt="Screenshot-20210927-180224" border="0"></a>
+<a href="https://ibb.co/tXc9fyW"><img src="https://i.ibb.co/vYmS52K/Screenshot-20210927-180519.jpg" alt="Screenshot-20210927-180519" border="0" width="400"></a>
+<a href="https://ibb.co/3ztQtLb"><img src="https://i.ibb.co/TLzdzFG/Screenshot-20210927-180513.jpg" alt="Screenshot-20210927-180513" border="0" width="400"></a>
+<a href="https://ibb.co/bFGYT3D"><img src="https://i.ibb.co/nBK490t/Screenshot-20210927-180433.jpg" alt="Screenshot-20210927-180433" border="0" width="400"></a>
+<a href="https://ibb.co/bWHx2GC"><img src="https://i.ibb.co/p0WgRkM/Screenshot-20210927-180224.jpg" alt="Screenshot-20210927-180224" border="0" width="400"></a>
